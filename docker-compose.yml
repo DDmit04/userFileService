@@ -17,11 +17,13 @@ services:
     build:
       dockerfile: Flask
     environment:
-      DB_URL: "postgresql://file_user:pswd@database:5432/file_database"
+      DB_URL: "postgresql://file_user:pswd@database/file_database"
       SEPARATOR: '/'
       UPLOAD_DIR_NAME: 'userFiles'
+    ports:
+      - 5000:5000
     depends_on:
-      - postgres
+      - database
     links:
       - database
 
@@ -34,7 +36,7 @@ services:
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "ps"
     volumes:
-      - - .:/docker-entrypoint-initdb.d
+      - .:/docker-entrypoint-initdb.d
       - ./data/:/var/lib/postgresql/data
     ports:
       - 5432:5432
