@@ -1,14 +1,10 @@
-class AddFileRecordRequest:
-    name = ''
-    extension = ''
-    size = 0
-    path = ''
-    comment = ''
+from dataclasses import dataclass
 
-    def __init__(self, name, extension, size, path, comment) -> None:
-        super().__init__()
-        self.name = name
-        self.extension = extension
-        self.size = size
-        self.path = path
-        self.comment = comment
+
+@dataclass
+class AddFileRecordRequest:
+    name: str = ''
+    extension: str = ''
+    size: int = 0
+    path: str = ''
+    comment: str = ''

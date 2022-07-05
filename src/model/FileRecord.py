@@ -1,9 +1,11 @@
+from dataclasses import dataclass
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy_serializer import SerializerMixin
 
 db: SQLAlchemy = SQLAlchemy()
 
-class FileRecord(db.Model, SerializerMixin):
+
+@dataclass
+class FileRecord(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     extension = db.Column(db.String, nullable=False)
@@ -16,8 +18,5 @@ class FileRecord(db.Model, SerializerMixin):
     def __init__(self, **kwargs):
         super(FileRecord, self).__init__(**kwargs)
 
-    def as_dict(self):
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
-
-    def get_full_filename(self):
+    def get_full_filename(self) -> str:
         return self.name + self.extension

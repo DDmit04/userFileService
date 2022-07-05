@@ -1,9 +1,8 @@
-class ErrorResponseException(BaseException):
-    message = ''
-    status_code = 500
+from dataclasses import dataclass
 
-    def __init__(self, message, status) -> None:
-        super().__init__()
-        self.message = message
-        self.status_code = status
+
+@dataclass
+class ErrorResponseException(BaseException):
+    message: str = ''
+    status_code: int = 500
 

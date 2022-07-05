@@ -1,18 +1,19 @@
 from datetime import datetime
+from typing import Dict
 
 from flask import current_app
 
-from exception.records.FileRecordPathAlreadyExistsException import FileRecordPathAlreadyExistsException
-from utils.DataabseUtils import transactional
-from model.FileRecord import FileRecord
-from model.dto.AddFileRecordRequest import AddFileRecordRequest
-from repos.FileRecordRepository import FileRecordRepository
+from src.exception.records.FileRecordPathAlreadyExistsException import FileRecordPathAlreadyExistsException
+from src.model.FileRecord import FileRecord
+from src.model.dto.AddFileRecordRequest import AddFileRecordRequest
+from src.repos.FileRecordRepository import FileRecordRepository
+from src.utils.DataabseUtils import transactional
 
 
 class FileRecordService:
 
     @transactional
-    def add_new_file_record(self, add_file_record_request: AddFileRecordRequest):
+    def add_new_file_record(self, add_file_record_request: AddFileRecordRequest) -> FileRecord:
         new_file: FileRecord = self.__create_new_file_record(add_file_record_request)
         file_record_repo: FileRecordRepository = current_app.file_repo
         filename = new_file.name
@@ -26,41 +27,41 @@ class FileRecordService:
             return saved_file
 
     @transactional
-    def delete_file_record(self, file_id):
+    def delete_file_record(self, file_id: int):
         current_app.file_repo.delete_file(file_id)
 
     @transactional
-    def list_files_records(self):
+    def list_files_records(self) -> list[FileRecord]:
         files = current_app.file_repo.get_all_files()
         return files
 
     @transactional
-    def get_file_record(self, file_id):
+    def get_file_record(self, file_id: int) -> FileRecord:
         file = current_app.file_repo.get_file(file_id)
         return file
 
     @transactional
-    def update_file_comment(self, file_id, new_comment):
+    def update_file_comment(self, file_id: int, new_comment: str) -> FileRecord:
         return self.__update_file_info(file_id, {FileRecord.comment: new_comment})
 
     @transactional
-    def update_file_name(self, file_id, new_name):
+    def update_file_name(self, file_id: int, new_name: str) -> FileRecord:
         return self.__update_file_info(file_id, {FileRecord.name: new_name})
 
     @transactional
-    def update_file_path(self, file_id, new_path):
+    def update_file_path(self, file_id: int, new_path: str) -> FileRecord:
         return self.__update_file_info(file_id, {FileRecord.path: new_path})
 
     @transactional
-    def get_file_records_on_level(self, dir_level):
+    def get_file_records_on_level(self, dir_level: str) -> list[FileRecord]:
         file_records = current_app.file_repo.get_file_records_by_dir(dir_level)
         return file_records
 
-    def __update_file_info(self, file_id, update_dict):
+    def __update_file_info(self, file_id: int, update_dict: Dict) -> FileRecord:
         file = current_app.file_repo.update_file(file_id, update_dict)
         return file
 
-    def __create_new_file_record(self, add_file_record_request):
+    def __create_new_file_record(self, add_file_record_request: AddFileRecordRequest) -> FileRecord:
         current_date = datetime.now()
         current_date_iso = current_date.isoformat()
         new_file: FileRecord = FileRecord(

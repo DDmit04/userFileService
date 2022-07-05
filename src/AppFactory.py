@@ -46,14 +46,12 @@ def setup_app(app):
         return error
 
     session: Session = db.session
-    refresh_data_before_start(session, app.config)
+    refresh_data_before_start(session, app.config['UPLOAD_FOLDER'], app.config['PATH_SEPARATOR'])
 
     return app
 
 
-def refresh_data_before_start(session: Session, app_config):
-    base_dir = app_config['UPLOAD_FOLDER']
-    path_separator = current_app.config['PATH_SEPARATOR']
+def refresh_data_before_start(session: Session, base_dir, path_separator):
     file_record_service: FileRecordService = current_app.file_record_service
     file_service: FileService = current_app.file_service
     all_files_records: list[FileRecord] = session.query(FileRecord).all()
@@ -78,7 +76,7 @@ def refresh_data_before_start(session: Session, app_config):
             file_record_service.add_new_file_record(addFileRecordRequest)
 
 
-def get_file_record_path_from_real_path(base_dir, separator, real_filepath):
+def get_file_record_path_from_real_path(base_dir: str, separator: str, real_filepath: str) -> str:
     path = real_filepath.replace(base_dir, '')
     path = os.path.normpath(path)
     path_elements = path.split(os.sep)
@@ -87,7 +85,7 @@ def get_file_record_path_from_real_path(base_dir, separator, real_filepath):
     return path_head
 
 
-def get_real_filepaths(dir_path):
+def get_real_filepaths(dir_path: str):
     res = []
     for path in os.listdir(dir_path):
         if os.path.isfile(os.path.join(dir_path, path)):

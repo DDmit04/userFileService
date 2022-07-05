@@ -1,4 +1,4 @@
-from exception.ErrorResponseException import ErrorResponseException
+from src.exception.ErrorResponseException import ErrorResponseException
 
 
 class FileSystemException(ErrorResponseException):
