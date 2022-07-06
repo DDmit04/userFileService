@@ -1,3 +1,4 @@
+import datetime
 from dataclasses import dataclass
 from flask_sqlalchemy import SQLAlchemy
 
@@ -6,6 +7,15 @@ db: SQLAlchemy = SQLAlchemy()
 
 @dataclass
 class FileRecord(db.Model):
+    id: int
+    name: str
+    extension: str
+    size: int
+    path: str
+    created_at: datetime
+    updated_at: datetime
+    comment: str
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     extension = db.Column(db.String, nullable=False)

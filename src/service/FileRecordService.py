@@ -1,43 +1,52 @@
 from datetime import datetime
 from typing import Dict
 
-from flask import current_app
+from sqlalchemy.orm import Session
 
+from src.exception.records.FileRecordIdNotFoundException import FileRecordIdNotFoundException
 from src.exception.records.FileRecordPathAlreadyExistsException import FileRecordPathAlreadyExistsException
 from src.model.FileRecord import FileRecord
 from src.model.dto.AddFileRecordRequest import AddFileRecordRequest
-from src.repos.FileRecordRepository import FileRecordRepository
-from src.utils.DataabseUtils import transactional
+from src.service.TransactionableService import TransactionRequiredService
+from src.utils.DatabaseUtills import transactional
 
 
-class FileRecordService:
+class FileRecordService(TransactionRequiredService):
+
+    def __init__(self, database) -> None:
+        super().__init__(database)
 
     @transactional
     def add_new_file_record(self, add_file_record_request: AddFileRecordRequest) -> FileRecord:
         new_file: FileRecord = self.__create_new_file_record(add_file_record_request)
-        file_record_repo: FileRecordRepository = current_app.file_repo
         filename = new_file.name
         file_ext = new_file.extension
         file_path = new_file.path
-        existing_file: FileRecord = file_record_repo.get_file_record_by_path(file_path, filename, file_ext)
+        session: Session = self.database.session
+        existing_file: FileRecord = session.query(FileRecord).filter(
+            FileRecord.path == file_path,
+            FileRecord.name == filename,
+            FileRecord.extension == file_ext).first()
         if existing_file is not None:
-            raise FileRecordPathAlreadyExistsException(f"{file_path}/{filename}.{file_ext}")
+            raise FileRecordPathAlreadyExistsException(f"{file_path}/{filename}{file_ext}")
         else:
-            saved_file: FileRecord = file_record_repo.save_file(new_file)
-            return saved_file
+            session.add(new_file)
+            return new_file
 
     @transactional
     def delete_file_record(self, file_id: int):
-        current_app.file_repo.delete_file(file_id)
+        session: Session = self.database.session
+        session.query(FileRecord).filter(FileRecord.id == file_id).delete()
 
     @transactional
     def list_files_records(self) -> list[FileRecord]:
-        files = current_app.file_repo.get_all_files()
+        session: Session = self.database.session
+        files = session.query(FileRecord).all()
         return files
 
     @transactional
     def get_file_record(self, file_id: int) -> FileRecord:
-        file = current_app.file_repo.get_file(file_id)
+        file = self.get_file(file_id)
         return file
 
     @transactional
@@ -54,11 +63,26 @@ class FileRecordService:
 
     @transactional
     def get_file_records_on_level(self, dir_level: str) -> list[FileRecord]:
-        file_records = current_app.file_repo.get_file_records_by_dir(dir_level)
+        session: Session = self.database.session
+        file_records = session.query(FileRecord).filter(FileRecord.path.contains(dir_level)).all()
         return file_records
 
     def __update_file_info(self, file_id: int, update_dict: Dict) -> FileRecord:
-        file = current_app.file_repo.update_file(file_id, update_dict)
+        current_date = datetime.now()
+        current_date_iso = current_date.isoformat()
+        update_dict.update({
+            FileRecord.updated_at: current_date_iso
+        })
+        file = self.get_file(file_id)
+        session: Session = self.database.session
+        session.query(FileRecord).filter(FileRecord.id == file_id).update(update_dict)
+        return file
+
+    def get_file(self, file_id):
+        session: Session = self.database.session
+        file = session.query(FileRecord).filter(FileRecord.id == file_id).first()
+        if file is None:
+            raise FileRecordIdNotFoundException(file_id)
         return file
 
     def __create_new_file_record(self, add_file_record_request: AddFileRecordRequest) -> FileRecord:
@@ -73,3 +97,4 @@ class FileRecordService:
             comment=add_file_record_request.comment
         )
         return new_file
+
