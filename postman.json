@@ -1,0 +1,270 @@
+{
+	"info": {
+		"_postman_id": "edf731f5-5e2e-4021-be76-bfce9e3662c9",
+		"name": "file project",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "10336020"
+	},
+	"item": [
+		{
+			"name": "edit",
+			"item": [
+				{
+					"name": "updatee path",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"comment\": \"new comemnt\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/file/edit/5/comment",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"file",
+								"edit",
+								"5",
+								"comment"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updatee comment",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"comment\": \"new comemnt\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/file/edit/5/comment",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"file",
+								"edit",
+								"5",
+								"comment"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update name",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"comment\": \"new comemnt\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/file/edit/5/comment",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"file",
+								"edit",
+								"5",
+								"comment"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "get all files info",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{HOST}}/file/info",
+					"host": [
+						"{{HOST}}"
+					],
+					"path": [
+						"file",
+						"info"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add file",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/Даниил/OneDrive/Рабочий стол/wals/divinity.jpg"
+						},
+						{
+							"key": "path",
+							"value": "\"/path\"",
+							"type": "text"
+						},
+						{
+							"key": "comment",
+							"value": "\"comment 123\"",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST}}/file",
+					"host": [
+						"{{HOST}}"
+					],
+					"path": [
+						"file"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get file info",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{HOST}}/file/info/1",
+					"host": [
+						"{{HOST}}"
+					],
+					"path": [
+						"file",
+						"info",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get files by dir",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"level\": \"/lul/wwww\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{HOST}}/file/info/level",
+					"host": [
+						"{{HOST}}"
+					],
+					"path": [
+						"file",
+						"info",
+						"level"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "download file",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{HOST}}/file/1",
+					"host": [
+						"{{HOST}}"
+					],
+					"path": [
+						"file",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete file",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{HOST}}/file/1",
+					"host": [
+						"{{HOST}}"
+					],
+					"path": [
+						"file",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "HOST",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
