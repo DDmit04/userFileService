@@ -1,9 +1,10 @@
 services:
   web_server:
+    image: nginx:latest
     restart: always
     container_name: nginx
-    build:
-      dockerfile: docker/Nginx
+    volumes:
+      - ./docker/default.conf:/etc/nginx/conf.d/default.conf:ro
     ports:
       - 80:80
     depends_on:
@@ -15,7 +16,7 @@ services:
     restart: always
     container_name: flask
     build:
-      dockerfile: Flask
+      dockerfile: docker/Docker.Flask
     environment:
       DB_URL: "postgresql://file_user:pswd@database/file_database"
       UPLOAD_FOLDER_NAME: "userFiles"
@@ -40,7 +41,7 @@ services:
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "ps"
     volumes:
-      - .:/docker-entrypoint-initdb.d
+      - ./docker:/docker-entrypoint-initdb.d
       - ./data/:/var/lib/postgresql/data
     ports:
       - 5432:5432
