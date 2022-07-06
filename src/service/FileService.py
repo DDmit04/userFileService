@@ -29,7 +29,6 @@ class FileService:
             raise FileSystemException()
         return filepath
 
-
     def delete_file(self, file_record: FileRecord):
         additional_path = file_record.path
         filename = file_record.get_full_filename()
