@@ -4,10 +4,12 @@ from dotenv import load_dotenv
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
-from src.service.FileRecordService import FileRecordService
-from src.service.FileService import FileService
-from src.service.FileServiceFacade import FileServiceFacade
-from src.service.FileSyncService import FileSyncService
+from service.FileRecordService import FileRecordService
+from service.FileService import FileService
+from service.FileServiceFacade import FileServiceFacade
+from service.FileSyncService import FileSyncService
+
+from RootDir import ROOT_DIR
 
 load_dotenv()
 
@@ -24,7 +26,7 @@ class DependencyInjector:
         super().__init__()
         self.setup_app()
         self.setup_database(database)
-        upload_dir = os.getenv('UPLOAD_FOLDER_PATH')
+        upload_dir = os.path.join(ROOT_DIR, os.getenv('UPLOAD_FOLDER_NAME'))
         path_separator = os.getenv('PATH_SEPARATOR')
         self.file_service = FileService(upload_dir, path_separator)
         self.file_record_service = FileRecordService(database)
@@ -38,6 +40,6 @@ class DependencyInjector:
 
     def setup_app(self):
         self.app = Flask(__name__)
-        self.app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DB_URL")
+        self.app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DB_URL']
         app_ctx = self.app.app_context()
         app_ctx.push()

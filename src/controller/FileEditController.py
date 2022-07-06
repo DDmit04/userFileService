@@ -1,11 +1,11 @@
 from flask import Blueprint, request, jsonify
 from flask_expects_json import expects_json
 
-from src.dependency.DependencyContainer import di_container
-from src.model import FileRecord
-from src.model.requests.RequestSchemas import file_comment_update_schema, filename_update_schema, filepath_update_schema
-from src.service import FileRecordService
-from src.utils.ControllerUtils import exception_handle
+from dependency.DependencyContainer import di_container
+from model import FileRecord
+from model.requests.RequestSchemas import file_comment_update_schema, filename_update_schema, filepath_update_schema
+from service import FileRecordService
+from utils.ControllerUtils import exception_handle
 
 file_edit_controller_blueprint = Blueprint('file_edit_controller', __name__)
 

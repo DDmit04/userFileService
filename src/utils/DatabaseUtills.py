@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
-from src.exception.TransactionalException import TransactionalException
-from src.service.TransactionableService import TransactionRequiredService
+from exception.TransactionalException import TransactionalException
+from service.TransactionableService import TransactionRequiredService
 
 
 def transactional(func):

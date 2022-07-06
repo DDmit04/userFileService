@@ -1,4 +1,4 @@
-from src.exception.ErrorResponseException import ErrorResponseException
+from exception.ErrorResponseException import ErrorResponseException
 
 
 def exception_handle(func):

@@ -2,12 +2,12 @@ import pathlib
 
 from werkzeug.datastructures import FileStorage
 
-from src.model.FileRecord import FileRecord
-from src.model.dto.AddFileRecordRequest import AddFileRecordRequest
-from src.service.FileRecordService import FileRecordService
-from src.service.FileService import FileService
-from src.service.TransactionableService import TransactionRequiredService
-from src.utils.DatabaseUtills import transactional
+from model.FileRecord import FileRecord
+from model.dto.AddFileRecordRequest import AddFileRecordRequest
+from service.FileRecordService import FileRecordService
+from service.FileService import FileService
+from service.TransactionableService import TransactionRequiredService
+from utils.DatabaseUtills import transactional
 
 
 class FileServiceFacade(TransactionRequiredService):

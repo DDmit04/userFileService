@@ -1,4 +1,4 @@
-from src.dependency.DependencyInjector import DependencyInjector
-from src.model.DatabaseInit import database
+from dependency.DependencyInjector import DependencyInjector
+from model.DatabaseInit import database
 
 di_container = DependencyInjector(database)

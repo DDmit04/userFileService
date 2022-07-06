@@ -3,7 +3,7 @@ services:
     restart: always
     container_name: nginx
     build:
-      dockerfile: Nginx
+      dockerfile: docker/Nginx
     ports:
       - 80:80
     depends_on:
@@ -18,10 +18,14 @@ services:
       dockerfile: Flask
     environment:
       DB_URL: "postgresql://file_user:pswd@database/file_database"
-      SEPARATOR: '/'
-      UPLOAD_DIR_NAME: 'userFiles'
-    ports:
-      - 5000:5000
+      UPLOAD_FOLDER_NAME: "userFiles"
+    volumes:
+      - ./userFiles:/app/userFiles
+    command: gunicorn --bind 0.0.0.0:5000 app:app
+    expose:
+      - 5000
+    env_file:
+      - docker/docker.env
     depends_on:
       - database
     links:

@@ -4,9 +4,9 @@ import shutil
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
 
-from src.exception.file.FileNotFoundException import FileNotFoundException
-from src.exception.file.FileSystemException import FileSystemException
-from src.model.FileRecord import FileRecord
+from exception.file.FileNotFoundException import FileNotFoundException
+from exception.file.FileSystemException import FileSystemException
+from model.FileRecord import FileRecord
 
 
 class FileService:

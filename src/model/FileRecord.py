@@ -1,7 +1,7 @@
 import datetime
 from dataclasses import dataclass
 
-from src.model.DatabaseInit import database
+from model.DatabaseInit import database
 
 
 @dataclass

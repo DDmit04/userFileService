@@ -1,10 +1,10 @@
 from flask import Blueprint, current_app, request, Response, send_file, jsonify
 from werkzeug.datastructures import FileStorage
 
-from src.dependency.DependencyContainer import di_container
-from src.model.FileRecord import FileRecord
-from src.service import FileRecordService, FileServiceFacade, FileService
-from src.utils.ControllerUtils import exception_handle
+from dependency.DependencyContainer import di_container
+from model.FileRecord import FileRecord
+from service import FileService, FileRecordService, FileServiceFacade
+from utils.ControllerUtils import exception_handle
 
 file_controller_blueprint = Blueprint('file_controller', __name__)
 
