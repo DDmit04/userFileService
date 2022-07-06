@@ -23,7 +23,7 @@ class FileSyncService(TransactionRequiredService):
         self._file_service = file_service
 
     @transactional
-    def refresh_data_before_start(self):
+    def sync_storage_data(self):
         all_files_records: list[FileRecord] = self._file_record_service.list_files_records()
         all_real_filepaths = self.__get_real_filepaths(self._base_dir)
         for file_record in all_files_records:
