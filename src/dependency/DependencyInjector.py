@@ -10,29 +10,21 @@ from service.FileService import FileService
 from service.FileServiceFacade import FileServiceFacade
 from service.FileSyncService import FileSyncService
 
-from RootDir import ROOT_DIR
-
 load_dotenv()
 
 
 class DependencyInjector:
-    app: Flask
-    database: SQLAlchemy
-    file_service: FileService
-    file_record_service: FileRecordService
-    file_service_facade: FileServiceFacade
-    file_sync_service: FileSyncService
-    config: Dict
 
-    def __init__(self, database) -> None:
+    def __init__(self, database: SQLAlchemy):
         super().__init__()
         self.setup_app()
         self.setup_database(database)
-        upload_dir = os.path.join(ROOT_DIR, os.getenv('UPLOAD_FOLDER_NAME'))
-        tmp_dir = os.path.join(ROOT_DIR, os.getenv('TMP_DIR_NAME'))
+        root_dir = os.getenv("ROOT_DIR")
+        upload_dir = os.path.join(root_dir, os.getenv('UPLOAD_FOLDER_NAME'))
+        tmp_dir = os.path.join(root_dir, os.getenv('TMP_DIR_NAME'))
         path_separator = os.getenv('PATH_SEPARATOR')
         self.config = {
-            'ROOT_DIR': ROOT_DIR,
+            'ROOT_DIR': root_dir,
             'PATH_SEPARATOR': path_separator,
             'TMP_DIR_NAME': tmp_dir,
             'UPLOAD_FOLDER_NAME': upload_dir
