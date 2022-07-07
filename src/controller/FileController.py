@@ -26,8 +26,9 @@ def add_file():
             additional_path_str,
             comment
         )
+        response = jsonify(created_file)
         di_container.close_database_session(request_id)
-        return jsonify(created_file)
+        return response
     else:
         raise ErrorResponseException('File is empty!', 400)
 

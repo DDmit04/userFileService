@@ -19,8 +19,9 @@ def get_file_records_list():
     file_record_service: FileRecordService = di_container\
         .get_file_record_service(request_id)
     file_records = file_record_service.list_files_records()
+    response = jsonify(file_records)
     di_container.close_database_session(request_id)
-    return jsonify(file_records)
+    return response
 
 
 @file_record_controller_blueprint.route('/<file_id>', methods=["GET"])
@@ -30,8 +31,9 @@ def get_file_record(file_id: int):
     file_record_service: FileRecordService = di_container\
         .get_file_record_service(request_id)
     file_record: FileRecord = file_record_service.get_record(file_id)
+    response = jsonify(file_record)
     di_container.close_database_session(request_id)
-    return jsonify(file_record)
+    return response
 
 
 @file_record_controller_blueprint.route('/level', methods=["GET"])
@@ -44,6 +46,7 @@ def get_file_records_by_dir():
     dir_level = request.json['level']
     file_records: list[FileRecord] = file_record_service\
         .get_records_on_dir(dir_level)
+    response = jsonify(file_records)
     di_container.close_database_session(request_id)
-    return jsonify(file_records)
+    return response
 

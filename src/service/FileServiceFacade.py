@@ -57,7 +57,7 @@ class FileServiceFacade(TransactionRequiredService):
 
     @transactional
     def update_file_path(self, file_id: int, new_path: str) -> FileRecord:
-        new_path = self._file_service.secure_additional_path(new_path)
+        new_path = self._file_record_service.secure_additional_path(new_path)
         file_record_to_update: FileRecord = self._file_record_service\
             .get_record(file_id)
         self._file_service.update_file_path(file_record_to_update, new_path)

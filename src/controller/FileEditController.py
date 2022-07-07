@@ -1,6 +1,6 @@
 import uuid
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, Response
 from flask_expects_json import expects_json
 
 from dependency.DependencyContainer import di_container
@@ -20,10 +20,9 @@ def update_file_comment(file_id: int):
     file_record_service: FileRecordService = di_container\
         .get_file_record_service(request_id)
     new_comment = request.json['comment']
-    updated_file_record: FileRecord = file_record_service\
-        .update_record_comment(file_id, new_comment)
+    file_record_service.update_record_comment(file_id, new_comment)
     di_container.close_database_session(request_id)
-    return jsonify(updated_file_record)
+    return Response(status=204)
 
 
 @file_edit_controller_blueprint.route('<file_id>/name', methods=["PATCH"])
@@ -33,9 +32,9 @@ def update_filename(file_id: int):
     request_id = str(uuid.uuid1())
     new_name = request.json['name']
     file_service_facade = di_container.get_file_service_facade(request_id)
-    updated_record = file_service_facade.update_filename(file_id, new_name)
+    file_service_facade.update_filename(file_id, new_name)
     di_container.close_database_session(request_id)
-    return jsonify(updated_record)
+    return Response(status=204)
 
 
 @file_edit_controller_blueprint.route('<file_id>/path', methods=["PATCH"])
@@ -45,6 +44,6 @@ def update_file_path(file_id: int):
     request_id = str(uuid.uuid1())
     new_path = request.json['path']
     file_service_facade = di_container.get_file_service_facade(request_id)
-    updated_record = file_service_facade.update_file_path(file_id, new_path)
+    file_service_facade.update_file_path(file_id, new_path)
     di_container.close_database_session(request_id)
-    return jsonify(updated_record)
+    return Response(status=204)

@@ -70,6 +70,7 @@ class FileRecordService(TransactionRequiredService):
 
     @transactional
     def get_records_on_dir(self, dir_level: str) -> list[FileRecord]:
+        dir_level = self.secure_additional_path(dir_level)
         file_records = self.session.query(FileRecord) \
             .filter(FileRecord.path.startswith(dir_level)) \
             .all()
