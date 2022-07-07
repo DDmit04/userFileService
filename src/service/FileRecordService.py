@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Dict
 
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import Session
 
 from exception.records.FileRecordIdNotFoundException import \
@@ -15,9 +16,7 @@ from utils.DatabaseUtills import transactional
 
 class FileRecordService(TransactionRequiredService):
 
-    _path_separator: str
-
-    def __init__(self, database, path_separator) -> None:
+    def __init__(self, database: SQLAlchemy, path_separator: str) -> None:
         super().__init__(database)
         self._path_separator = path_separator
 

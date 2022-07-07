@@ -1,3 +1,4 @@
+from flask_sqlalchemy import SQLAlchemy
 from model.FileRecord import FileRecord
 from model.dto.AddFileRecordRequest import AddFileRecordRequest
 from model.dto.FIleStatsDto import FileStatsDto
@@ -12,7 +13,9 @@ class FileServiceFacade(TransactionRequiredService):
     _file_service: FileService
     _file_record_service: FileRecordService
 
-    def __init__(self, database, file_service, file_record_service) -> None:
+    def __init__(self, database: SQLAlchemy,
+                 file_service: FileService,
+                 file_record_service: FileRecordService) -> None:
         super().__init__(database)
         self._file_service = file_service
         self._file_record_service = file_record_service

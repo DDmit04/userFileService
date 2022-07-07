@@ -38,7 +38,7 @@ class DependencyInjector:
             'UPLOAD_FOLDER_NAME': upload_dir
         }
         self.file_service = FileService(tmp_dir, upload_dir, path_separator)
-        self.file_record_service = FileRecordService(database)
+        self.file_record_service = FileRecordService(database, path_separator)
         self.file_sync_service = FileSyncService(
             database,
             upload_dir,

@@ -10,13 +10,11 @@ from utils.DatabaseUtills import transactional
 
 
 class FileSyncService(TransactionRequiredService):
-    _base_dir: str
-    _path_separator: str
-    _file_record_service: FileRecordService
-    _file_service: FileService
 
-    def __init__(self, database, base_dir, path_separator,
-                 file_record_service, file_service) -> None:
+    def __init__(self, database, base_dir: str,
+                 path_separator: str,
+                 file_record_service: FileRecordService,
+                 file_service: FileService) -> None:
         super().__init__(database)
         self._base_dir = base_dir
         self._path_separator = path_separator

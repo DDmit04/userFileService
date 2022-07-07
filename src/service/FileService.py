@@ -12,11 +12,11 @@ from model.dto.FIleStatsDto import FileStatsDto
 
 
 class FileService:
-    _path_separator: str
-    _base_dir: str
-    _tmp_dir: str
 
-    def __init__(self, tmp_dir, upload_dir, path_separator) -> None:
+    def __init__(self,
+                 tmp_dir: str,
+                 upload_dir: str,
+                 path_separator: str) -> None:
         super().__init__()
         self._tmp_dir = tmp_dir
         self._path_separator = path_separator
