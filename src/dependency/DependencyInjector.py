@@ -1,7 +1,5 @@
 import os
-import uuid
 from dataclasses import dataclass
-from typing import TypedDict
 
 import humanfriendly
 from dotenv import load_dotenv
@@ -28,7 +26,7 @@ class SessionRecord:
 
 class DependencyInjector:
 
-    def __init__(self) -> None:
+    def __init__(self):
         super().__init__()
         self.sessions_pool: list[SessionRecord] = []
 
@@ -50,7 +48,7 @@ class DependencyInjector:
         }
         return config
 
-    def get_file_sync_service(self, session_id):
+    def get_file_sync_service(self, session_id: str) -> FileSyncService:
         config = self.get_config()
         upload_dir_path = config['UPLOAD_DIR_PATH']
         tmp_dir_path = config['TMP_DIR_PATH']
@@ -64,7 +62,7 @@ class DependencyInjector:
             self.get_file_service()
         )
 
-    def get_file_service(self):
+    def get_file_service(self) -> FileService:
         config = self.get_config()
         tmp_dir_path = config['TMP_DIR_PATH']
         upload_dir_path = config['UPLOAD_DIR_PATH']
@@ -75,14 +73,14 @@ class DependencyInjector:
             path_separator
         )
 
-    def get_file_service_facade(self, session_id):
+    def get_file_service_facade(self, session_id: str) -> FileServiceFacade:
         return FileServiceFacade(
             self.get_database_session(session_id),
             self.get_file_service(),
             self.get_file_record_service(session_id)
         )
 
-    def get_file_record_service(self, session_id):
+    def get_file_record_service(self, session_id: str) -> FileRecordService:
         config = self.get_config()
         path_separator = config['PATH_SEPARATOR']
         return FileRecordService(
@@ -90,7 +88,7 @@ class DependencyInjector:
             path_separator
         )
 
-    def get_flask_app(self):
+    def get_flask_app(self) -> Flask:
         config = self.get_config()
         app = Flask(__name__)
         app.config['SQLALCHEMY_DATABASE_URI'] = config['DB_URL']
@@ -99,16 +97,11 @@ class DependencyInjector:
         app_ctx.push()
         return app
 
-    def get_database_session(self, session_id):
-        existing_session_record: SessionRecord = self.__find_session_by_id(
-            session_id)
+    def get_database_session(self, session_id: str) -> Session:
+        existing_session_record: SessionRecord = self \
+            .__find_session_by_id(session_id)
         if existing_session_record is None:
-            config = self.get_config()
-            db_url: str = config['DB_URL']
-            engine: str = create_engine(db_url, echo=True)
-            Base.metadata.create_all(engine)
-            session_maker: sessionmaker = sessionmaker(bind=engine)
-            session: Session = session_maker()
+            session = self.__create_new_database_session()
             self.sessions_pool.append(SessionRecord(session_id, session))
             session.begin()
             return session
@@ -124,7 +117,16 @@ class DependencyInjector:
         session.close()
         self.sessions_pool.remove(existing_session_record)
 
-    def __find_session_by_id(self, session_id):
+    def __create_new_database_session(self) -> Session:
+        config = self.get_config()
+        db_url: str = config['DB_URL']
+        engine: str = create_engine(db_url, echo=True)
+        Base.metadata.create_all(engine)
+        session_maker: sessionmaker = sessionmaker(bind=engine)
+        session: Session = session_maker()
+        return session
+
+    def __find_session_by_id(self, session_id) -> SessionRecord:
         for existing_session in self.sessions_pool:
             if existing_session.session_id == session_id:
                 return existing_session

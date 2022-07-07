@@ -1,11 +1,11 @@
 import uuid
 
-from flask import Blueprint, request, jsonify, Response
+from flask import Blueprint, request, Response
 from flask_expects_json import expects_json
 
 from dependency.DependencyContainer import di_container
-from model import FileRecord
-from model.requests.RequestSchemas import file_comment_update_schema, filename_update_schema, filepath_update_schema
+from model.requests.RequestSchemas import file_comment_update_schema, \
+    filename_update_schema, filepath_update_schema
 from service import FileRecordService
 from utils.ControllerUtils import exception_handle
 

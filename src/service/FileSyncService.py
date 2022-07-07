@@ -1,7 +1,7 @@
 import os
 import pathlib
 
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import Session
 
 from model.FileRecord import FileRecord
 from model.dto.AddFileRecordRequest import AddFileRecordRequest

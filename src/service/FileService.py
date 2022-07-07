@@ -7,7 +7,6 @@ from werkzeug.datastructures import FileStorage
 from exception.file.FileNotFoundException import FileNotFoundException
 from exception.file.FileSystemException import FileSystemException
 from model.FileRecord import FileRecord
-
 from model.dto.FIleStatsDto import FileStatsDto
 
 
@@ -16,7 +15,7 @@ class FileService:
     def __init__(self,
                  tmp_dir: str,
                  upload_dir: str,
-                 path_separator: str) -> None:
+                 path_separator: str):
         super().__init__()
         self._tmp_dir = tmp_dir
         self._path_separator = path_separator

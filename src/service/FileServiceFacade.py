@@ -1,5 +1,5 @@
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import Session
+from werkzeug.datastructures import FileStorage
 
 from model.FileRecord import FileRecord
 from model.dto.AddFileRecordRequest import AddFileRecordRequest
@@ -8,14 +8,13 @@ from service.FileRecordService import FileRecordService
 from service.FileService import FileService
 from service.TransactionableService import TransactionRequiredService
 from utils.DatabaseUtills import transactional
-from werkzeug.datastructures import FileStorage
 
 
 class FileServiceFacade(TransactionRequiredService):
 
     def __init__(self, session: Session,
                  file_service: FileService,
-                 file_record_service: FileRecordService) -> None:
+                 file_record_service: FileRecordService):
         super().__init__(session)
         self._file_service = file_service
         self._file_record_service = file_record_service
