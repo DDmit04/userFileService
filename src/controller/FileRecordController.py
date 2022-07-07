@@ -22,7 +22,7 @@ def get_file_records_list():
 @exception_handle
 def get_file_record(file_id: int):
     file_record_service: FileRecordService = di_container.file_record_service
-    file_record: FileRecord = file_record_service.get_file_record(file_id)
+    file_record: FileRecord = file_record_service.get_record(file_id)
     return jsonify(file_record)
 
 
@@ -32,6 +32,7 @@ def get_file_record(file_id: int):
 def get_file_records_by_dir():
     file_record_service: FileRecordService = di_container.file_record_service
     dir_level = request.json['level']
-    file_records: list[FileRecord] = file_record_service.get_file_records_on_dir(dir_level)
+    file_records: list[FileRecord] = file_record_service\
+        .get_records_on_dir(dir_level)
     return jsonify(file_records)
 

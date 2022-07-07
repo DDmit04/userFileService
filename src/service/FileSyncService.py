@@ -15,7 +15,8 @@ class FileSyncService(TransactionRequiredService):
     _file_record_service: FileRecordService
     _file_service: FileService
 
-    def __init__(self, database, base_dir, path_separator, file_record_service, file_service) -> None:
+    def __init__(self, database, base_dir, path_separator,
+                 file_record_service, file_service) -> None:
         super().__init__(database)
         self._base_dir = base_dir
         self._path_separator = path_separator
@@ -24,7 +25,8 @@ class FileSyncService(TransactionRequiredService):
 
     @transactional
     def sync_storage_data(self):
-        all_files_records: list[FileRecord] = self._file_record_service.list_files_records()
+        all_files_records: list[FileRecord] = self._file_record_service\
+            .list_files_records()
         all_real_filepaths = self.__get_real_filepaths(self._base_dir)
         for file_record in all_files_records:
             filename = file_record.name + file_record.extension
@@ -38,12 +40,21 @@ class FileSyncService(TransactionRequiredService):
         if len(all_real_filepaths) != 0:
             for full_filepath in all_real_filepaths:
                 filename = os.path.basename(full_filepath)
-                path_head = self.__get_file_record_path_from_real_path(full_filepath)
+                path_head = self.__get_file_record_path_from_real_path(
+                    full_filepath
+                )
                 name = pathlib.Path(filename).stem
                 extension = pathlib.Path(filename).suffix
                 size = os.path.getsize(full_filepath)
-                addFileRecordRequest = AddFileRecordRequest(name, extension, size, path_head, '')
-                self._file_record_service.add_new_file_record(addFileRecordRequest)
+                addFileRecordRequest = AddFileRecordRequest(
+                    name,
+                    extension,
+                    size,
+                    path_head,
+                    ''
+                )
+                self._file_record_service\
+                    .add_new_file_record(addFileRecordRequest)
         self._file_service.clean_up_dirs(self._base_dir)
 
     def __get_file_record_path_from_real_path(self, real_filepath: str) -> str:

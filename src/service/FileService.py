@@ -3,7 +3,6 @@ import pathlib
 import shutil
 
 from werkzeug.datastructures import FileStorage
-from werkzeug.utils import secure_filename
 
 from exception.file.FileNotFoundException import FileNotFoundException
 from exception.file.FileSystemException import FileSystemException
@@ -24,7 +23,10 @@ class FileService:
         self._base_dir = upload_dir
 
     def save_file(self, file_stats: FileStatsDto, additional_path: str) -> str:
-        new_filepath = self.get_filepath(additional_path, file_stats.get_full_filename())
+        new_filepath = self.get_filepath(
+            additional_path,
+            file_stats.get_full_filename()
+        )
         try:
             os.makedirs(os.path.dirname(new_filepath), exist_ok=True)
             full_tmp_path = file_stats.full_path
@@ -44,7 +46,10 @@ class FileService:
         ext = updated_file_record.extension
         old_filename = updated_file_record.get_full_filename()
         new_filename = new_name + ext
-        old_filepath = self.get_filepath_check_exists(additional_path, old_filename)
+        old_filepath = self.get_filepath_check_exists(
+            additional_path,
+            old_filename
+        )
         new_filepath = self.get_filepath(additional_path, new_filename)
         os.rename(old_filepath, new_filepath)
 
@@ -58,7 +63,8 @@ class FileService:
         os.remove(old_filepath)
         self.clean_up_dirs(self._base_dir)
 
-    def get_filepath_check_exists(self, additional_path: str, filename: str) -> str:
+    def get_filepath_check_exists(self, additional_path: str, filename: str)\
+            -> str:
         filepath = self.get_filepath(additional_path, filename)
         file_exists = os.path.exists(filepath)
         if not file_exists:

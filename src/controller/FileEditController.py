@@ -16,7 +16,8 @@ file_edit_controller_blueprint = Blueprint('file_edit_controller', __name__)
 def update_file_comment(file_id: int):
     file_record_service: FileRecordService = di_container.file_record_service
     new_comment = request.json['comment']
-    updated_file_record: FileRecord = file_record_service.update_file_record_comment(file_id, new_comment)
+    updated_file_record: FileRecord = file_record_service\
+        .update_record_comment(file_id, new_comment)
     return jsonify(updated_file_record)
 
 

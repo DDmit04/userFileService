@@ -16,7 +16,11 @@ def add_file():
     file: FileStorage = request.files['file']
     additional_path_str = request.form['path']
     comment = request.form['comment']
-    created_file: FileRecord = file_service_facade.add_file(file, additional_path_str, comment)
+    created_file: FileRecord = file_service_facade.add_file(
+        file,
+        additional_path_str,
+        comment
+    )
     return jsonify(created_file)
 
 
@@ -33,7 +37,7 @@ def delete_file(file_id: int):
 def download_file(file_id: int):
     file_record_service: FileRecordService = di_container.file_record_service
     file_service: FileService = di_container.file_service
-    file_record: FileRecord = file_record_service.get_file_record(file_id)
+    file_record: FileRecord = file_record_service.get_record(file_id)
     full_filename = file_record.get_full_filename()
     filepath = file_service.get_filepath_check_exists(
         file_record.path,

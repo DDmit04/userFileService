@@ -18,7 +18,7 @@ class FileRecordService(TransactionRequiredService):
 
     @transactional
     def add_new_file_record(self, add_file_record_request: AddFileRecordRequest) -> FileRecord:
-        new_file: FileRecord = self.__create_new_file_record(add_file_record_request)
+        new_file: FileRecord = self.__create_new_record(add_file_record_request)
         filename = new_file.name
         file_ext = new_file.extension
         file_path = new_file.path
@@ -46,46 +46,57 @@ class FileRecordService(TransactionRequiredService):
 
     @transactional
     def get_file_record(self, file_id: int) -> FileRecord:
-        file = self.get_file_record(file_id)
+        file = self.get_record(file_id)
         return file
 
     @transactional
-    def update_file_record_comment(self, file_id: int, new_comment: str) -> FileRecord:
-        return self.__update_file_record_info(file_id, {FileRecord.comment: new_comment})
+    def update_record_comment(self, file_id: int, new_comment: str)\
+            -> FileRecord:
+        return self.__update_record_info(
+            file_id,
+            {FileRecord.comment: new_comment})
 
     @transactional
-    def update_file_record_name(self, file_id: int, new_name: str) -> FileRecord:
-        return self.__update_file_record_info(file_id, {FileRecord.name: new_name})
+    def update_record_name(self, file_id: int, new_name: str) -> FileRecord:
+        return self.__update_record_info(file_id, {FileRecord.name: new_name})
 
     @transactional
-    def update_file_record_path(self, file_id: int, new_path: str) -> FileRecord:
-        return self.__update_file_record_info(file_id, {FileRecord.path: new_path})
+    def update_record_path(self, file_id: int, new_path: str) -> FileRecord:
+        return self.__update_record_info(file_id, {FileRecord.path: new_path})
 
     @transactional
-    def get_file_records_on_dir(self, dir_level: str) -> list[FileRecord]:
+    def get_records_on_dir(self, dir_level: str) -> list[FileRecord]:
         session: Session = self.database.session
-        file_records = session.query(FileRecord).filter(FileRecord.path.startswith(dir_level)).all()
+        file_records = session.query(FileRecord)\
+            .filter(FileRecord.path.startswith(dir_level))\
+            .all()
         return file_records
 
-    def __update_file_record_info(self, file_id: int, update_dict: Dict) -> FileRecord:
+    def __update_record_info(self, file_id: int, update_dict: Dict)\
+            -> FileRecord:
         current_date = datetime.now()
         current_date_iso = current_date.isoformat()
         update_dict.update({
             FileRecord.updated_at: current_date_iso
         })
-        file = self.get_file_record(file_id)
+        file = self.get_record(file_id)
         session: Session = self.database.session
-        session.query(FileRecord).filter(FileRecord.id == file_id).update(update_dict)
+        session.query(FileRecord)\
+            .filter(FileRecord.id == file_id)\
+            .update(update_dict)
         return file
 
-    def get_file_record(self, file_id) -> FileRecord:
+    def get_record(self, file_id) -> FileRecord:
         session: Session = self.database.session
-        file = session.query(FileRecord).filter(FileRecord.id == file_id).first()
+        file = session.query(FileRecord)\
+            .filter(FileRecord.id == file_id)\
+            .first()
         if file is None:
             raise FileRecordIdNotFoundException(file_id)
         return file
 
-    def __create_new_file_record(self, add_file_record_request: AddFileRecordRequest) -> FileRecord:
+    def __create_new_record(self, add_file_record_request: AddFileRecordRequest)\
+            -> FileRecord:
         current_date = datetime.now()
         current_date_iso = current_date.isoformat()
         new_file: FileRecord = FileRecord(

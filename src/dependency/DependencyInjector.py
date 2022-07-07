@@ -31,8 +31,18 @@ class DependencyInjector:
         path_separator = os.getenv('PATH_SEPARATOR')
         self.file_service = FileService(tmp_dir, upload_dir, path_separator)
         self.file_record_service = FileRecordService(database)
-        self.file_sync_service = FileSyncService(database, upload_dir, path_separator, self.file_record_service, self.file_service)
-        self.file_service_facade = FileServiceFacade(database, self.file_service, self.file_record_service)
+        self.file_sync_service = FileSyncService(
+            database,
+            upload_dir,
+            path_separator,
+            self.file_record_service,
+            self.file_service
+        )
+        self.file_service_facade = FileServiceFacade(
+            database,
+            self.file_service,
+            self.file_record_service
+        )
 
     def setup_database(self, database):
         database.init_app(self.app)
