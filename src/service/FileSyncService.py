@@ -1,6 +1,8 @@
 import os
 import pathlib
 
+from sqlalchemy.orm import sessionmaker, Session
+
 from model.FileRecord import FileRecord
 from model.dto.AddFileRecordRequest import AddFileRecordRequest
 from service.FileRecordService import FileRecordService
@@ -11,12 +13,16 @@ from utils.DatabaseUtills import transactional
 
 class FileSyncService(TransactionRequiredService):
 
-    def __init__(self, database, base_dir: str,
+    def __init__(self,
+                 session: Session,
+                 tmp_dir_filepath,
+                 upload_dir_path: str,
                  path_separator: str,
                  file_record_service: FileRecordService,
-                 file_service: FileService) -> None:
-        super().__init__(database)
-        self._base_dir = base_dir
+                 file_service: FileService):
+        super().__init__(session)
+        self._tmp_dir_path = tmp_dir_filepath
+        self._upload_dir_path = upload_dir_path
         self._path_separator = path_separator
         self._file_record_service = file_record_service
         self._file_service = file_service
@@ -25,7 +31,7 @@ class FileSyncService(TransactionRequiredService):
     def sync_storage_data(self):
         all_files_records: list[FileRecord] = self._file_record_service\
             .list_files_records()
-        all_real_filepaths = self.__get_real_filepaths(self._base_dir)
+        all_real_filepaths = self.__get_real_filepaths(self._upload_dir_path)
         for file_record in all_files_records:
             filename = file_record.name + file_record.extension
             path = file_record.path
@@ -53,10 +59,14 @@ class FileSyncService(TransactionRequiredService):
                 )
                 self._file_record_service\
                     .add_new_file_record(addFileRecordRequest)
-        self._file_service.clean_up_dirs(self._base_dir)
+        self._file_service.clean_up_dirs(self._upload_dir_path)
+
+    def clean_up_tmp_dir(self):
+        for path in os.listdir(self._tmp_dir_path):
+            os.remove(os.path.join(self._tmp_dir_path, path))
 
     def __get_file_record_path_from_real_path(self, real_filepath: str) -> str:
-        path = real_filepath.replace(self._base_dir, '')
+        path = real_filepath.replace(self._upload_dir_path, '')
         path = os.path.normpath(path)
         path_elements = path.split(os.sep)
         path = self._path_separator.join(path_elements)

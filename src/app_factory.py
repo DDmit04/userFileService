@@ -19,6 +19,8 @@ def setup_app(app: Flask) -> Flask:
     def bad_request(error):
         if isinstance(error.description, ValidationError):
             original_error = error.description
-            return make_response(jsonify({'error': original_error.message}), 400)
+            return make_response(jsonify(
+                {'error': original_error.message}),
+                400)
         return error
     return app

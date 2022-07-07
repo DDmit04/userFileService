@@ -14,9 +14,10 @@ services:
     environment:
       DB_URL: "postgresql://file_user:pswd@postgres/file_database"
       UPLOAD_FOLDER_NAME: "user_files"
-      PATH_SEPARATOR: "/"
-      TMP_DIR_NAME: "tmp_dir"
+      TMP_FOLDER_NAME: "tmp_dir"
       ROOT_DIR: '/file_storage'
+      PATH_SEPARATOR: "/"
+      MAX_CONTENT_LENGTH: 6M
     volumes:
       - ./docker/file_storage:/file_storage
       - ./src:/app/src

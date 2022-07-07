@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import Dict
 
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import Session
 
 from exception.records.FileRecordIdNotFoundException import \
@@ -16,8 +15,8 @@ from utils.DatabaseUtills import transactional
 
 class FileRecordService(TransactionRequiredService):
 
-    def __init__(self, database: SQLAlchemy, path_separator: str) -> None:
-        super().__init__(database)
+    def __init__(self, session: Session, path_separator: str):
+        super().__init__(session)
         self._path_separator = path_separator
 
     @transactional
@@ -28,8 +27,7 @@ class FileRecordService(TransactionRequiredService):
         filename = new_file.name
         file_ext = new_file.extension
         file_path = new_file.path
-        session: Session = self.database.session
-        existing_file: FileRecord = session.query(FileRecord).filter(
+        existing_file: FileRecord = self.session.query(FileRecord).filter(
             FileRecord.path == file_path,
             FileRecord.name == filename,
             FileRecord.extension == file_ext).first()
@@ -37,18 +35,17 @@ class FileRecordService(TransactionRequiredService):
             raise FileRecordPathAlreadyExistsException(
                 f"{file_path}/{filename}{file_ext}")
         else:
-            session.add(new_file)
+            self.session.add(new_file)
             return new_file
 
     @transactional
     def delete_file_record(self, file_id: int):
-        session: Session = self.database.session
-        session.query(FileRecord).filter(FileRecord.id == file_id).delete()
+        self.session.query(FileRecord).filter(FileRecord.id ==
+                                              file_id).delete()
 
     @transactional
     def list_files_records(self) -> list[FileRecord]:
-        session: Session = self.database.session
-        files = session.query(FileRecord).all()
+        files = self.session.query(FileRecord).all()
         return files
 
     @transactional
@@ -73,8 +70,7 @@ class FileRecordService(TransactionRequiredService):
 
     @transactional
     def get_records_on_dir(self, dir_level: str) -> list[FileRecord]:
-        session: Session = self.database.session
-        file_records = session.query(FileRecord) \
+        file_records = self.session.query(FileRecord) \
             .filter(FileRecord.path.startswith(dir_level)) \
             .all()
         return file_records
@@ -87,15 +83,13 @@ class FileRecordService(TransactionRequiredService):
             FileRecord.updated_at: current_date_iso
         })
         file = self.get_record(file_id)
-        session: Session = self.database.session
-        session.query(FileRecord) \
+        self.session.query(FileRecord) \
             .filter(FileRecord.id == file_id) \
             .update(update_dict)
         return file
 
     def get_record(self, file_id) -> FileRecord:
-        session: Session = self.database.session
-        file = session.query(FileRecord) \
+        file = self.session.query(FileRecord) \
             .filter(FileRecord.id == file_id) \
             .first()
         if file is None:

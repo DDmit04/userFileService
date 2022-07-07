@@ -1,4 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import sessionmaker, Session
+
 from model.FileRecord import FileRecord
 from model.dto.AddFileRecordRequest import AddFileRecordRequest
 from model.dto.FIleStatsDto import FileStatsDto
@@ -10,13 +12,11 @@ from werkzeug.datastructures import FileStorage
 
 
 class FileServiceFacade(TransactionRequiredService):
-    _file_service: FileService
-    _file_record_service: FileRecordService
 
-    def __init__(self, database: SQLAlchemy,
+    def __init__(self, session: Session,
                  file_service: FileService,
                  file_record_service: FileRecordService) -> None:
-        super().__init__(database)
+        super().__init__(session)
         self._file_service = file_service
         self._file_record_service = file_record_service
 

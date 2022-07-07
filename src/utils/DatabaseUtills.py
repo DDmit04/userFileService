@@ -1,6 +1,4 @@
-from sqlalchemy.orm import Session
-
-from exception.TransactionalException import TransactionalException
+from exception.transaction.TransactionalException import TransactionalException
 from service.TransactionableService import TransactionRequiredService
 
 
@@ -9,12 +7,14 @@ def transactional(func):
         if not isinstance(self, TransactionRequiredService):
             raise TransactionalException("Call transactional method "
                                          "outside transactional service!")
-        db_session: Session = self.database.session
+        transactional_service: TransactionRequiredService = self
+        transaction = transactional_service.session.begin_nested()
         try:
             res = func(self, *args, **kw)
-            db_session.commit()
+            transaction.commit()
         except Exception as e:
-            db_session.rollback()
+            transaction.rollback()
             raise e
         return res
+
     return wrapper

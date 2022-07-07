@@ -1,11 +1,14 @@
 import datetime
 from dataclasses import dataclass
 
-from model.DatabaseInit import database
+from sqlalchemy import Column, Integer, String, DateTime
+
+from model.DatabaseInit import Base
 
 
 @dataclass
-class FileRecord(database.Model):
+class FileRecord(Base):
+    __tablename__ = 'file_record'
     id: int
     name: str
     extension: str
@@ -15,14 +18,14 @@ class FileRecord(database.Model):
     updated_at: datetime
     comment: str
 
-    id = database.Column(database.Integer, primary_key=True)
-    name = database.Column(database.String, nullable=False)
-    extension = database.Column(database.String, nullable=False)
-    size = database.Column(database.Integer, nullable=False, default=0)
-    path = database.Column(database.String, nullable=False, default=0)
-    created_at = database.Column(database.DateTime, default=0)
-    updated_at = database.Column(database.DateTime, default=None)
-    comment = database.Column(database.String, nullable=False)
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    extension = Column(String, nullable=False)
+    size = Column(Integer, nullable=False, default=0)
+    path = Column(String, nullable=False, default=0)
+    created_at = Column(DateTime, default=0)
+    updated_at = Column(DateTime, default=None)
+    comment = Column(String, nullable=False)
 
     def __init__(self, **kwargs):
         super(FileRecord, self).__init__(**kwargs)

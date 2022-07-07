@@ -20,7 +20,7 @@ class FileService:
         super().__init__()
         self._tmp_dir = tmp_dir
         self._path_separator = path_separator
-        self._base_dir = upload_dir
+        self._upload_dir = upload_dir
 
     def save_file(self, file_stats: FileStatsDto, additional_path: str) -> str:
         new_filepath = self.get_filepath(
@@ -39,7 +39,7 @@ class FileService:
     def delete_file(self, additional_path: str, filename: str):
         filepath = self.get_filepath_check_exists(additional_path, filename)
         os.remove(filepath)
-        self.clean_up_dirs(self._base_dir)
+        self.clean_up_dirs(self._upload_dir)
 
     def update_filename(self, updated_file_record: FileRecord, new_name: str):
         additional_path = updated_file_record.path
@@ -61,7 +61,7 @@ class FileService:
         os.makedirs(os.path.dirname(new_filepath), exist_ok=True)
         shutil.copy(old_filepath, new_filepath)
         os.remove(old_filepath)
-        self.clean_up_dirs(self._base_dir)
+        self.clean_up_dirs(self._upload_dir)
 
     def get_filepath_check_exists(self, additional_path: str, filename: str)\
             -> str:
@@ -73,7 +73,7 @@ class FileService:
 
     def get_filepath(self, additional_path: str, filename: str) -> str:
         additional_folders = additional_path.split(self._path_separator)
-        filepath = self._base_dir
+        filepath = self._upload_dir
         for additional_folder in additional_folders:
             filepath = os.path.join(filepath, additional_folder)
         filepath = os.path.join(filepath, filename)
@@ -104,5 +104,5 @@ class FileService:
                 if isdir:
                     self.clean_up_dirs(full_path)
         files = os.listdir(dir_path)
-        if len(files) == 0 and dir_path is not self._base_dir:
+        if len(files) == 0 and dir_path != self._upload_dir:
             os.rmdir(dir_path)

@@ -1,8 +1,8 @@
-from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import Session
 
 
 class TransactionRequiredService(object):
 
-    def __init__(self, database: SQLAlchemy) -> None:
+    def __init__(self, session: Session) -> None:
         super().__init__()
-        self.database = database
+        self.session = session
