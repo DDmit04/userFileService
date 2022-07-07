@@ -10,18 +10,17 @@ services:
   app:
     restart: always
     build:
-      dockerfile: docker/Docker.Flask
+      dockerfile: Dockerfile
     environment:
       DB_URL: "postgresql://file_user:pswd@postgres/file_database"
-      UPLOAD_FOLDER_NAME: "userFiles"
+      UPLOAD_FOLDER_NAME: "user_files"
       PATH_SEPARATOR: "/"
-      TMP_DIR_NAME: "tmpDir"
+      TMP_DIR_NAME: "tmp_dir"
+      ROOT_DIR: '/file_storage'
     volumes:
-      - ./userFiles:/app/userFiles
+      - ./docker/file_storage:/file_storage
       - ./src:/app/src
-#    command: gunicorn --bind 0.0.0.0:5000 app:app
-    expose:
-      - 5000
+    command: gunicorn --bind 0.0.0.0:5000 --pythonpath src main:app
 
   postgres:
     restart: always
@@ -31,8 +30,8 @@ services:
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "ps"
     volumes:
-      - ./docker:/docker-entrypoint-initdb.d
-      - ./data/:/var/lib/postgresql/data
+      - ./docker/postgres:/docker-entrypoint-initdb.d
+      - ./docker/postgres/data:/var/lib/postgresql/data
     ports:
       - 5432:5432
 
