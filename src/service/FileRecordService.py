@@ -3,8 +3,10 @@ from typing import Dict
 
 from sqlalchemy.orm import Session
 
-from exception.records.FileRecordIdNotFoundException import FileRecordIdNotFoundException
-from exception.records.FileRecordPathAlreadyExistsException import FileRecordPathAlreadyExistsException
+from exception.records.FileRecordIdNotFoundException import \
+    FileRecordIdNotFoundException
+from exception.records.FileRecordPathAlreadyExistsException import \
+    FileRecordPathAlreadyExistsException
 from model.FileRecord import FileRecord
 from model.dto.AddFileRecordRequest import AddFileRecordRequest
 from service.TransactionableService import TransactionRequiredService
@@ -13,12 +15,17 @@ from utils.DatabaseUtills import transactional
 
 class FileRecordService(TransactionRequiredService):
 
-    def __init__(self, database) -> None:
+    _path_separator: str
+
+    def __init__(self, database, path_separator) -> None:
         super().__init__(database)
+        self._path_separator = path_separator
 
     @transactional
-    def add_new_file_record(self, add_file_record_request: AddFileRecordRequest) -> FileRecord:
-        new_file: FileRecord = self.__create_new_record(add_file_record_request)
+    def add_new_file_record(self,
+                            add_file_record_request: AddFileRecordRequest) -> FileRecord:
+        new_file: FileRecord = self.__create_new_record(
+            add_file_record_request)
         filename = new_file.name
         file_ext = new_file.extension
         file_path = new_file.path
@@ -28,7 +35,8 @@ class FileRecordService(TransactionRequiredService):
             FileRecord.name == filename,
             FileRecord.extension == file_ext).first()
         if existing_file is not None:
-            raise FileRecordPathAlreadyExistsException(f"{file_path}/{filename}{file_ext}")
+            raise FileRecordPathAlreadyExistsException(
+                f"{file_path}/{filename}{file_ext}")
         else:
             session.add(new_file)
             return new_file
@@ -50,7 +58,7 @@ class FileRecordService(TransactionRequiredService):
         return file
 
     @transactional
-    def update_record_comment(self, file_id: int, new_comment: str)\
+    def update_record_comment(self, file_id: int, new_comment: str) \
             -> FileRecord:
         return self.__update_record_info(
             file_id,
@@ -67,12 +75,12 @@ class FileRecordService(TransactionRequiredService):
     @transactional
     def get_records_on_dir(self, dir_level: str) -> list[FileRecord]:
         session: Session = self.database.session
-        file_records = session.query(FileRecord)\
-            .filter(FileRecord.path.startswith(dir_level))\
+        file_records = session.query(FileRecord) \
+            .filter(FileRecord.path.startswith(dir_level)) \
             .all()
         return file_records
 
-    def __update_record_info(self, file_id: int, update_dict: Dict)\
+    def __update_record_info(self, file_id: int, update_dict: Dict) \
             -> FileRecord:
         current_date = datetime.now()
         current_date_iso = current_date.isoformat()
@@ -81,21 +89,30 @@ class FileRecordService(TransactionRequiredService):
         })
         file = self.get_record(file_id)
         session: Session = self.database.session
-        session.query(FileRecord)\
-            .filter(FileRecord.id == file_id)\
+        session.query(FileRecord) \
+            .filter(FileRecord.id == file_id) \
             .update(update_dict)
         return file
 
     def get_record(self, file_id) -> FileRecord:
         session: Session = self.database.session
-        file = session.query(FileRecord)\
-            .filter(FileRecord.id == file_id)\
+        file = session.query(FileRecord) \
+            .filter(FileRecord.id == file_id) \
             .first()
         if file is None:
             raise FileRecordIdNotFoundException(file_id)
         return file
 
-    def __create_new_record(self, add_file_record_request: AddFileRecordRequest)\
+    def secure_additional_path(self, path: str):
+        path_separator = self._path_separator
+        if not path.startswith(path_separator):
+            path = f'/{path}'
+        if path.endswith(path_separator):
+            path = path[:-1]
+        return path
+
+    def __create_new_record(self,
+                            add_file_record_request: AddFileRecordRequest) \
             -> FileRecord:
         current_date = datetime.now()
         current_date_iso = current_date.isoformat()
@@ -108,4 +125,3 @@ class FileRecordService(TransactionRequiredService):
             comment=add_file_record_request.comment
         )
         return new_file
-

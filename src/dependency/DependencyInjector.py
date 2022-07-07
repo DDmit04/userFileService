@@ -1,4 +1,5 @@
 import os
+from typing import Dict
 
 from dotenv import load_dotenv
 from flask import Flask
@@ -21,6 +22,7 @@ class DependencyInjector:
     file_record_service: FileRecordService
     file_service_facade: FileServiceFacade
     file_sync_service: FileSyncService
+    config: Dict
 
     def __init__(self, database) -> None:
         super().__init__()
@@ -29,6 +31,12 @@ class DependencyInjector:
         upload_dir = os.path.join(ROOT_DIR, os.getenv('UPLOAD_FOLDER_NAME'))
         tmp_dir = os.path.join(ROOT_DIR, os.getenv('TMP_DIR_NAME'))
         path_separator = os.getenv('PATH_SEPARATOR')
+        self.config = {
+            'ROOT_DIR': ROOT_DIR,
+            'PATH_SEPARATOR': path_separator,
+            'TMP_DIR_NAME': tmp_dir,
+            'UPLOAD_FOLDER_NAME': upload_dir
+        }
         self.file_service = FileService(tmp_dir, upload_dir, path_separator)
         self.file_record_service = FileRecordService(database)
         self.file_sync_service = FileSyncService(
