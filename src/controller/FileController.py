@@ -2,6 +2,7 @@ from flask import Blueprint, request, Response, send_file, jsonify
 from werkzeug.datastructures import FileStorage
 
 from dependency.DependencyContainer import di_container
+from exception.ErrorResponseException import ErrorResponseException
 from model.FileRecord import FileRecord
 from service import FileService, FileRecordService, FileServiceFacade
 from utils.ControllerUtils import exception_handle
@@ -13,16 +14,18 @@ file_controller_blueprint = Blueprint('file_controller', __name__)
 @exception_handle
 def add_file():
     file_service_facade: FileServiceFacade = di_container.file_service_facade
-    file: FileStorage = request.files['file']
-    additional_path_str = request.form['path']
-    comment = request.form['comment']
-    created_file: FileRecord = file_service_facade.add_file(
-        file,
-        additional_path_str,
-        comment
-    )
-    return jsonify(created_file)
-
+    file: FileStorage = request.files.get('file', None)
+    if file is not None:
+        additional_path_str = request.form['path']
+        comment = request.form['comment']
+        created_file: FileRecord = file_service_facade.add_file(
+            file,
+            additional_path_str,
+            comment
+        )
+        return jsonify(created_file)
+    else:
+        raise ErrorResponseException('File is empty!', 400)
 
 @file_controller_blueprint.route('/<file_id>', methods=["DELETE"])
 @exception_handle

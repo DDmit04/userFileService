@@ -1,40 +1,30 @@
 services:
-  web_server:
+  nginx:
     image: nginx:latest
     restart: always
-    container_name: nginx
     volumes:
-      - ./docker/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
     ports:
       - 80:80
-    depends_on:
-      - app
-    links:
-      - app
 
   app:
     restart: always
-    container_name: flask
     build:
       dockerfile: docker/Docker.Flask
     environment:
-      DB_URL: "postgresql://file_user:pswd@database/file_database"
+      DB_URL: "postgresql://file_user:pswd@postgres/file_database"
       UPLOAD_FOLDER_NAME: "userFiles"
       PATH_SEPARATOR: "/"
       TMP_DIR_NAME: "tmpDir"
     volumes:
       - ./userFiles:/app/userFiles
-    command: gunicorn --bind 0.0.0.0:5000 app:app
+      - ./src:/app/src
+#    command: gunicorn --bind 0.0.0.0:5000 app:app
     expose:
       - 5000
-    depends_on:
-      - database
-    links:
-      - database
 
-  database:
+  postgres:
     restart: always
-    container_name: postgres
     image: postgres:latest
     environment:
       POSTGRES_DB: "file_database"
@@ -45,3 +35,7 @@ services:
       - ./data/:/var/lib/postgresql/data
     ports:
       - 5432:5432
+
+networks:
+  default:
+    name: test
