@@ -27,8 +27,9 @@ class DependencyInjector:
         self.setup_app()
         self.setup_database(database)
         upload_dir = os.path.join(ROOT_DIR, os.getenv('UPLOAD_FOLDER_NAME'))
+        tmp_dir = os.path.join(ROOT_DIR, os.getenv('TMP_DIR_NAME'))
         path_separator = os.getenv('PATH_SEPARATOR')
-        self.file_service = FileService(upload_dir, path_separator)
+        self.file_service = FileService(tmp_dir, upload_dir, path_separator)
         self.file_record_service = FileRecordService(database)
         self.file_sync_service = FileSyncService(database, upload_dir, path_separator, self.file_record_service, self.file_service)
         self.file_service_facade = FileServiceFacade(database, self.file_service, self.file_record_service)
@@ -40,6 +41,6 @@ class DependencyInjector:
 
     def setup_app(self):
         self.app = Flask(__name__)
-        self.app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DB_URL']
+        self.app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DB_URL')
         app_ctx = self.app.app_context()
         app_ctx.push()

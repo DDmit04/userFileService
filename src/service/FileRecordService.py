@@ -78,7 +78,7 @@ class FileRecordService(TransactionRequiredService):
         session.query(FileRecord).filter(FileRecord.id == file_id).update(update_dict)
         return file
 
-    def get_file_record(self, file_id):
+    def get_file_record(self, file_id) -> FileRecord:
         session: Session = self.database.session
         file = session.query(FileRecord).filter(FileRecord.id == file_id).first()
         if file is None:

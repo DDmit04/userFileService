@@ -20,13 +20,13 @@ services:
     environment:
       DB_URL: "postgresql://file_user:pswd@database/file_database"
       UPLOAD_FOLDER_NAME: "userFiles"
+      PATH_SEPARATOR: "/"
+      TMP_DIR_NAME: "tmpDir"
     volumes:
       - ./userFiles:/app/userFiles
     command: gunicorn --bind 0.0.0.0:5000 app:app
     expose:
       - 5000
-    env_file:
-      - docker/docker.env
     depends_on:
       - database
     links:

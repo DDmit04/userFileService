@@ -36,5 +36,5 @@ def update_filename(file_id: int):
 def update_file_path(file_id: int):
     new_path = request.json['path']
     file_service_facade = di_container.file_service_facade
-    updated_record = file_service_facade.update_file_record_path(file_id, new_path)
+    updated_record = file_service_facade.update_file_path(file_id, new_path)
     return jsonify(updated_record)

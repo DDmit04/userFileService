@@ -1,4 +1,4 @@
-from flask import Blueprint, current_app, request, Response, send_file, jsonify
+from flask import Blueprint, request, Response, send_file, jsonify
 from werkzeug.datastructures import FileStorage
 
 from dependency.DependencyContainer import di_container
@@ -32,11 +32,10 @@ def delete_file(file_id: int):
 @exception_handle
 def download_file(file_id: int):
     file_record_service: FileRecordService = di_container.file_record_service
-    file_service: FileService = current_app.file_service
+    file_service: FileService = di_container.file_service
     file_record: FileRecord = file_record_service.get_file_record(file_id)
     full_filename = file_record.get_full_filename()
-    filepath: str = file_service.get_filepath_check_exists(
-        current_app.config['UPLOAD_FOLDER'],
+    filepath = file_service.get_filepath_check_exists(
         file_record.path,
         full_filename
     )

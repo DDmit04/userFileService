@@ -43,10 +43,11 @@ class FileSyncService(TransactionRequiredService):
                 extension = pathlib.Path(filename).suffix
                 size = os.path.getsize(full_filepath)
                 addFileRecordRequest = AddFileRecordRequest(name, extension, size, path_head, '')
-                self._add_new_file_record(addFileRecordRequest)
+                self._file_record_service.add_new_file_record(addFileRecordRequest)
+        self._file_service.clean_up_dirs(self._base_dir)
 
-    def __get_file_record_path_from_real_path(self, base_dir: str, real_filepath: str) -> str:
-        path = real_filepath.replace(base_dir, '')
+    def __get_file_record_path_from_real_path(self, real_filepath: str) -> str:
+        path = real_filepath.replace(self._base_dir, '')
         path = os.path.normpath(path)
         path_elements = path.split(os.sep)
         path = self._path_separator.join(path_elements)
@@ -55,6 +56,8 @@ class FileSyncService(TransactionRequiredService):
 
     def __get_real_filepaths(self, dir_path: str):
         res = []
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path, exist_ok=True)
         for path in os.listdir(dir_path):
             if os.path.isfile(os.path.join(dir_path, path)):
                 res.append(os.path.join(dir_path, path))

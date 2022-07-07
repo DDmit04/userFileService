@@ -6,7 +6,7 @@ from controller.FileEditController import file_edit_controller_blueprint
 from controller.FileRecordController import file_record_controller_blueprint
 
 
-def setup_app(app: Flask):
+def setup_app(app: Flask) -> Flask:
 
     app.register_blueprint(file_controller_blueprint, url_prefix='/file')
     app.register_blueprint(file_record_controller_blueprint, url_prefix='/file/info')
