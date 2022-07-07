@@ -3,11 +3,10 @@ import uuid
 from flask import Blueprint, request, Response, send_file, jsonify
 from werkzeug.datastructures import FileStorage
 
-from dependency.DependencyContainer import di_container
-from exception.ErrorResponseException import ErrorResponseException
-from model.FileRecord import FileRecord
-from service import FileService, FileRecordService, FileServiceFacade
-from utils.ControllerUtils import exception_handle
+from dependency.dependency_container import di_container
+from exception.error_response_exception import ErrorResponseException
+from model.file_record import FileRecord
+from utils.controller_utils import exception_handle
 
 file_controller_blueprint = Blueprint('file_controller', __name__)
 

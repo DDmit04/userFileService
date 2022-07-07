@@ -3,12 +3,12 @@ import pathlib
 
 from sqlalchemy.orm import Session
 
-from model.FileRecord import FileRecord
-from model.dto.AddFileRecordRequest import AddFileRecordRequest
-from service.FileRecordService import FileRecordService
-from service.FileService import FileService
-from service.TransactionableService import TransactionRequiredService
-from utils.DatabaseUtills import transactional
+from model.dto.add_file_record_request import AddFileRecordRequest
+from model.file_record import FileRecord
+from service.file_record_service import FileRecordService
+from service.file_service import FileService
+from service.transaction_required_service import TransactionRequiredService
+from utils.database_utills import transactional
 
 
 class FileSyncService(TransactionRequiredService):

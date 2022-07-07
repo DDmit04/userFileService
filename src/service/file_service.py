@@ -4,10 +4,10 @@ import shutil
 
 from werkzeug.datastructures import FileStorage
 
-from exception.file.FileNotFoundException import FileNotFoundException
-from exception.file.FileSystemException import FileSystemException
-from model.FileRecord import FileRecord
-from model.dto.FIleStatsDto import FileStatsDto
+from exception.file.file_not_found_exception import FileNotFoundException
+from exception.file.file_system_exception import FileSystemException
+from model.dto.fIle_stats_dto import FileStatsDto
+from model.file_record import FileRecord
 
 
 class FileService:

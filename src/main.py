@@ -1,5 +1,5 @@
 from app_factory import setup_app
-from dependency.DependencyContainer import di_container
+from dependency.dependency_container import di_container
 
 
 file_sync_service = di_container.get_file_sync_service("")

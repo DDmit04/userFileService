@@ -1,9 +1,9 @@
 from flask import jsonify, make_response, Flask
 from jsonschema.exceptions import ValidationError
 
-from controller.FileController import file_controller_blueprint
-from controller.FileEditController import file_edit_controller_blueprint
-from controller.FileRecordController import file_record_controller_blueprint
+from controller.file_controller import file_controller_blueprint
+from controller.file_edit_controller import file_edit_controller_blueprint
+from controller.file_record_controller import file_record_controller_blueprint
 
 
 def setup_app(app: Flask) -> Flask:

@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 from sqlalchemy import Column, Integer, String, DateTime
 
-from model.DatabaseInit import Base
+from model.database_init import Base
 
 
 @dataclass

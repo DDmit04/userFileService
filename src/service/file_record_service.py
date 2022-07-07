@@ -3,14 +3,14 @@ from typing import Dict
 
 from sqlalchemy.orm import Session
 
-from exception.records.FileRecordIdNotFoundException import \
+from exception.records.file_recordId_not_found_exception import \
     FileRecordIdNotFoundException
-from exception.records.FileRecordPathAlreadyExistsException import \
+from exception.records.file_record_path_already_exists_exception import \
     FileRecordPathAlreadyExistsException
-from model.FileRecord import FileRecord
-from model.dto.AddFileRecordRequest import AddFileRecordRequest
-from service.TransactionableService import TransactionRequiredService
-from utils.DatabaseUtills import transactional
+from model.dto.add_file_record_request import AddFileRecordRequest
+from model.file_record import FileRecord
+from service.transaction_required_service import TransactionRequiredService
+from utils.database_utills import transactional
 
 
 class FileRecordService(TransactionRequiredService):

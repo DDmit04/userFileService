@@ -3,11 +3,9 @@ import uuid
 from flask import Blueprint, jsonify, request
 from flask_expects_json import expects_json
 
-from dependency.DependencyContainer import di_container
-from model import FileRecord
-from model.requests.RequestSchemas import file_level_search_schema
-from service import FileRecordService
-from utils.ControllerUtils import exception_handle
+from dependency.dependency_container import di_container
+from model.requests.request_schemas import file_level_search_schema
+from utils.controller_utils import exception_handle
 
 file_record_controller_blueprint = Blueprint('file_record_controller', __name__)
 
