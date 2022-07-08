@@ -1,0 +1,1 @@
+* */12 * * * python /app/src/file_synchronizer.py >> /logs/output.log

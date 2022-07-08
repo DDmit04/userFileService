@@ -7,6 +7,24 @@ services:
     ports:
       - 80:80
 
+  app-sync:
+#    restart: always
+    build:
+      dockerfile: Dockerfile
+    environment:
+      DB_URL: "postgresql://file_user:pswd@postgres/file_database"
+      UPLOAD_FOLDER_NAME: "user_files"
+      TMP_FOLDER_NAME: "tmp_dir"
+      ROOT_DIR: '/file_storage'
+      PATH_SEPARATOR: "/"
+    volumes:
+      - ./docker/cron/cron_jobs:/etc/crontabs/root
+      - ./docker/cron/logs/output.log:/logs/output.log
+      - ./docker/file_storage:/file_storage
+      - ./src:/app/src
+#    command: python src/file_synchronizer.py
+    command: crond -f -d 8
+
   app:
     restart: always
     build:

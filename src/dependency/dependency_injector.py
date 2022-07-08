@@ -32,13 +32,20 @@ class DependencyInjector:
         self.sessions_pool: list[SessionRecord] = []
 
     def get_config(self):
-        root_dir = os.getenv("ROOT_DIR")
-        upload_dir = os.path.join(root_dir, os.environ['UPLOAD_FOLDER_NAME'])
-        tmp_dir = os.path.join(root_dir, os.getenv('TMP_FOLDER_NAME'))
-        path_separator = os.getenv('PATH_SEPARATOR')
+        root_dir = os.environ.get('ROOT_DIR', '/file_root')
+        upload_dir = os.path.join(
+            root_dir,
+            os.environ.get('UPLOAD_FOLDER_NAME', '/files')
+        )
+        tmp_dir = os.path.join(
+            root_dir,
+            os.environ.get('TMP_FOLDER_NAME', '/tmp')
+        )
+        path_separator = os.environ.get('PATH_SEPARATOR', '/')
         db_url = os.getenv('DB_URL')
         max_content_len = humanfriendly.parse_size(
-            os.getenv('MAX_CONTENT_LENGTH'))
+            os.environ.get('MAX_CONTENT_LENGTH', '3M')
+        )
         config = {
             'ROOT_DIR': root_dir,
             'PATH_SEPARATOR': path_separator,
