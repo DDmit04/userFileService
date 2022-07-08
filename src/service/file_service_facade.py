@@ -39,7 +39,7 @@ class FileServiceFacade(TransactionRequiredService):
     @transactional
     def delete_file(self, file_id: int):
         file_to_delete_info: FileRecord = self._file_record_service\
-            .get_record(file_id)
+            .get_record_by_id(file_id)
         additional_path = file_to_delete_info.path
         full_filename = file_to_delete_info.get_full_filename()
         self._file_record_service.delete_file_record(file_id)
@@ -48,7 +48,7 @@ class FileServiceFacade(TransactionRequiredService):
     @transactional
     def update_filename(self, file_id: int, new_name: str) -> FileRecord:
         file_record_to_update: FileRecord = self._file_record_service\
-            .get_record(file_id)
+            .get_record_by_id(file_id)
         self._file_service.update_filename(file_record_to_update, new_name)
         file_record_to_update = self._file_record_service\
             .update_record_name(file_id, new_name)
@@ -58,7 +58,7 @@ class FileServiceFacade(TransactionRequiredService):
     def update_file_path(self, file_id: int, new_path: str) -> FileRecord:
         new_path = self._file_record_service.secure_additional_path(new_path)
         file_record_to_update: FileRecord = self._file_record_service\
-            .get_record(file_id)
+            .get_record_by_id(file_id)
         self._file_service.update_file_path(file_record_to_update, new_path)
         file_record_to_update = self._file_record_service\
             .update_record_path(file_id, new_path)

@@ -30,7 +30,7 @@ def get_file_records_list(session_id: str):
 def get_file_record(session_id: str, file_id: int):
     file_record_service: FileRecordService = di_container \
         .get_file_record_service(session_id)
-    file_record: FileRecord = file_record_service.get_record(file_id)
+    file_record: FileRecord = file_record_service.get_record_by_id(file_id)
     response = jsonify(file_record)
     return response
 

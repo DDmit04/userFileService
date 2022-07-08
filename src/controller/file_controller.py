@@ -51,7 +51,7 @@ def download_file(session_id: str, file_id: int):
     file_record_service: FileRecordService = \
         di_container.get_file_record_service(session_id)
     file_service: FileService = di_container.get_file_service()
-    file_record: FileRecord = file_record_service.get_record(file_id)
+    file_record: FileRecord = file_record_service.get_record_by_id(file_id)
     full_filename = file_record.get_full_filename()
     filepath = file_service.get_filepath_check_exists(
         file_record.path,

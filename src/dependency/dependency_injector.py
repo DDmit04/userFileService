@@ -10,7 +10,8 @@ from sqlalchemy.orm import sessionmaker, Session
 from exception.transaction.session_not_found_exception import \
     SessionNotFoundException
 from model.database_init import Base
-from service.fFile_sync_service import FileSyncService
+from repository.file_record_repository import FileRecordRepository
+from service.file_sync_service import FileSyncService
 from service.file_record_service import FileRecordService
 from service.file_service import FileService
 from service.file_service_facade import FileServiceFacade
@@ -73,6 +74,11 @@ class DependencyInjector:
             path_separator
         )
 
+    def get_file_record_repository(self, session_id):
+        return FileRecordRepository(
+            self.get_database_session(session_id)
+        )
+
     def get_file_service_facade(self, session_id: str) -> FileServiceFacade:
         return FileServiceFacade(
             self.get_database_session(session_id),
@@ -85,6 +91,7 @@ class DependencyInjector:
         path_separator = config['PATH_SEPARATOR']
         return FileRecordService(
             self.get_database_session(session_id),
+            self.get_file_record_repository(session_id),
             path_separator
         )
 
