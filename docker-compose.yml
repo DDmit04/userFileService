@@ -8,7 +8,6 @@ services:
       - 80:80
 
   app-sync:
-#    restart: always
     build:
       dockerfile: Dockerfile
     environment:
@@ -18,11 +17,10 @@ services:
       ROOT_DIR: '/file_storage'
       PATH_SEPARATOR: "/"
     volumes:
-      - ./docker/cron/cron_jobs:/etc/crontabs/root
       - ./docker/cron/logs/output.log:/logs/output.log
+      - ./docker/cron/logs/err.log:/logs/err.log
       - ./docker/file_storage:/file_storage
       - ./src:/app/src
-#    command: python src/file_synchronizer.py
     command: crond -f -d 8
 
   app:
