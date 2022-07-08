@@ -25,23 +25,22 @@ class FileRecordService(TransactionRequiredService):
 
     @transactional
     def add_new_file_record(self,
-                            add_file_record_request: AddFileRecordRequest) -> FileRecord:
+                            add_file_record_request: AddFileRecordRequest,
+                            creation_time: datetime,
+                            update_time: datetime) -> FileRecord:
+        new_file_record: FileRecord = self.__create_new_record(
+            add_file_record_request,
+            creation_time,
+            update_time
+        )
+        return self.__add_file_record(new_file_record)
+
+    @transactional
+    def add_new_file_record_by_request(self,
+                                       add_file_record_request: AddFileRecordRequest) -> FileRecord:
         new_file_record: FileRecord = self.__create_new_record(
             add_file_record_request)
-        filename = new_file_record.name
-        file_ext = new_file_record.extension
-        file_path = new_file_record.path
-        existing_file = self._file_record_repo.find_record_by_full_path(
-            file_path,
-            filename,
-            file_ext
-        )
-        if existing_file is not None:
-            raise FileRecordPathAlreadyExistsException(
-                f"{file_path}/{filename}{file_ext}")
-        else:
-            self._file_record_repo.save_file_record(new_file_record)
-            return new_file_record
+        return self.__add_file_record(new_file_record)
 
     @transactional
     def delete_file_record(self, file_id: int):
@@ -93,6 +92,22 @@ class FileRecordService(TransactionRequiredService):
             path = path[:-1]
         return path
 
+    def __add_file_record(self, new_file_record: FileRecord) -> FileRecord:
+        filename = new_file_record.name
+        file_ext = new_file_record.extension
+        file_path = new_file_record.path
+        existing_file = self._file_record_repo.find_record_by_full_path(
+            file_path,
+            filename,
+            file_ext
+        )
+        if existing_file is not None:
+            raise FileRecordPathAlreadyExistsException(
+                f"{file_path}/{filename}{file_ext}")
+        else:
+            self._file_record_repo.save_file_record(new_file_record)
+            return new_file_record
+
     def __create_new_record(self, add_record_request: AddFileRecordRequest) \
             -> FileRecord:
         current_date = datetime.now()
@@ -103,6 +118,23 @@ class FileRecordService(TransactionRequiredService):
             size=add_record_request.size,
             path=add_record_request.path,
             created_at=current_date_iso,
+            comment=add_record_request.comment
+        )
+        return new_file
+
+    def __create_new_record(self,
+                            add_record_request: AddFileRecordRequest,
+                            creation_time: datetime,
+                            update_time: datetime) -> FileRecord:
+        create_iso = creation_time.isoformat()
+        updated_iso = update_time.isoformat()
+        new_file: FileRecord = FileRecord(
+            name=add_record_request.name,
+            extension=add_record_request.extension,
+            size=add_record_request.size,
+            path=add_record_request.path,
+            created_at=create_iso,
+            updated_at=updated_iso,
             comment=add_record_request.comment
         )
         return new_file

@@ -32,7 +32,7 @@ class FileServiceFacade(TransactionRequiredService):
             additional_path_str,
             comment)
         created_file: FileRecord = self._file_record_service\
-            .add_new_file_record(addFileRecordRequest)
+            .add_new_file_record_by_request(addFileRecordRequest)
         self._file_service.save_file(fileStats, additional_path_str)
         return created_file
 
