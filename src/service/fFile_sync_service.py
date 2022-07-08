@@ -29,35 +29,36 @@ class FileSyncService(TransactionRequiredService):
 
     @transactional
     def sync_storage_data(self):
-        all_files_records: list[FileRecord] = self._file_record_service\
+        all_files_records: list[FileRecord] = self._file_record_service \
             .list_files_records()
-        all_real_filepaths = self.__get_real_filepaths(self._upload_dir_path)
+        real_files_paths = self.__get_real_filepaths(self._upload_dir_path)
         for file_record in all_files_records:
-            filename = file_record.name + file_record.extension
-            path = file_record.path
-            full_path = self._file_service.get_filepath(path, filename)
-            exists = all_real_filepaths.count(full_path)
-            if exists == 0:
-                self._file_record_service.delete_file_record(file_record.id)
+            record_filename = file_record.name + file_record.extension
+            record_path = file_record.path
+            record_full_path = self._file_service.get_filepath(
+                record_path,
+                record_filename
+            )
+            real_file_exists = real_files_paths.count(record_full_path) == 1
+            if not real_file_exists:
+                record_id = file_record.id
+                self._file_record_service.delete_file_record(record_id)
             else:
-                all_real_filepaths.remove(full_path)
-        if len(all_real_filepaths) != 0:
-            for full_filepath in all_real_filepaths:
-                filename = os.path.basename(full_filepath)
-                path_head = self.__get_file_record_path_from_real_path(
-                    full_filepath
+                real_files_paths.remove(record_full_path)
+        if len(real_files_paths) != 0:
+            for real_file_path in real_files_paths:
+                record_filename = os.path.basename(real_file_path)
+                file_dir = self.__get_file_record_path_from_real_path(
+                    real_file_path
                 )
-                name = pathlib.Path(filename).stem
-                extension = pathlib.Path(filename).suffix
-                size = os.path.getsize(full_filepath)
+                name = pathlib.Path(record_filename).stem
+                extension = pathlib.Path(record_filename).suffix
+                size = os.path.getsize(real_file_path)
                 addFileRecordRequest = AddFileRecordRequest(
-                    name,
-                    extension,
-                    size,
-                    path_head,
-                    ''
+                    name, extension,
+                    size, file_dir, ''
                 )
-                self._file_record_service\
+                self._file_record_service \
                     .add_new_file_record(addFileRecordRequest)
         self._file_service.clean_up_dirs(self._upload_dir_path)
 
