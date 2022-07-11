@@ -13,10 +13,10 @@ def bucket_exists(client, bucket_name):
     except ClientError as e:
         error_code = int(e.response['Error']['Code'])
         if error_code == 404:
-            return True
+            return False
         else:
             raise e
-    return False
+    return True
 
 
 boto_client = di_container.get_boto_client()

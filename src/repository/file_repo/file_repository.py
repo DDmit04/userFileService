@@ -12,6 +12,10 @@ class FileRepository(ABC):
         pass
 
     @abstractmethod
+    def get_all_files(self):
+        pass
+
+    @abstractmethod
     def update_file_path(self, old_file_path: str, new_file_path: str):
         pass
 

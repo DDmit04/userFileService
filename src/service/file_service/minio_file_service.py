@@ -1,3 +1,4 @@
+from botocore.exceptions import ClientError
 from werkzeug.datastructures import FileStorage
 
 from exception.file.file_system_exception import FileSystemException
@@ -17,6 +18,5 @@ class MinioFileService(FileService):
     def save_file(self, file: FileStorage, additional_path: str) -> str:
         try:
             return super().save_file(file, additional_path)
-        # TODO change to mimIO error
-        except IOError:
+        except ClientError:
             raise FileSystemException()

@@ -11,8 +11,7 @@ from repository.file_repo.file_repository import FileRepository
 
 class MinioFileRepository(FileRepository):
 
-    def __init__(self, boto_client: ServiceResource, default_bucket_name: str) \
-            -> None:
+    def __init__(self, boto_client: ServiceResource, default_bucket_name: str):
         super().__init__()
         self._boto_client = boto_client
         self._default_bucket_name = default_bucket_name
@@ -28,7 +27,10 @@ class MinioFileRepository(FileRepository):
         )
 
     def get_all_files(self):
-        pass
+        response = self._boto_client.list_objects(
+            Bucket=self._default_bucket_name,
+            Prefix="/")
+        list(map(lambda content: content['key'], response.get('Contents', [])))
 
     def update_file_path(self, old_file_path: str, new_file_path: str):
         pass

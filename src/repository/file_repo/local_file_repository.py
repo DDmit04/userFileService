@@ -15,6 +15,9 @@ class LocalFileRepository(FileRepository):
     def delete_file(self, path: str):
         os.remove(path)
 
+    def get_all_files(self):
+        pass
+
     def update_file_path(self, old_file_path: str, new_file_path: str):
         os.makedirs(os.path.dirname(new_file_path), exist_ok=True)
         shutil.copy(old_file_path, new_file_path)
