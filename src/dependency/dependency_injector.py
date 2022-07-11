@@ -1,5 +1,6 @@
 import os
 from dataclasses import dataclass
+from typing import Dict
 
 import humanfriendly
 from dotenv import load_dotenv
@@ -31,7 +32,7 @@ class DependencyInjector:
         super().__init__()
         self.sessions_pool: list[SessionRecord] = []
 
-    def get_config(self):
+    def get_config(self) -> Dict:
         root_dir = os.environ.get('ROOT_DIR', '/file_root')
         upload_dir = os.path.join(
             root_dir,

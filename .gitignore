@@ -5,3 +5,4 @@ __pycache__/
 /docker/postgres/data/
 /docker/file_storage/tmp_dir/*
 /docker/file_storage/user_files/*
+/docker/cron/logs/*
