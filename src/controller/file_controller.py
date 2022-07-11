@@ -1,5 +1,3 @@
-import uuid
-
 from flask import Blueprint, request, Response, send_file, jsonify
 from werkzeug.datastructures import FileStorage
 
@@ -7,7 +5,7 @@ from dependency.dependency_container import di_container
 from exception.error_response_exception import ErrorResponseException
 from model.file_record import FileRecord
 from service.file_record_service import FileRecordService
-from service.file_service import FileService
+from service.file_service.file_service import FileService
 from service.file_service_facade import FileServiceFacade
 from utils.controller_utils import exception_handle, require_session
 
@@ -53,8 +51,6 @@ def download_file(session_id: str, file_id: int):
     file_service: FileService = di_container.get_file_service()
     file_record: FileRecord = file_record_service.get_record_by_id(file_id)
     full_filename = file_record.get_full_filename()
-    filepath = file_service.get_filepath_check_exists(
-        file_record.path,
-        full_filename
-    )
-    return send_file(filepath, as_attachment=True)
+    file = file_service.get_file(file_record.path, full_filename)
+    file.seek(0)
+    return send_file(file, mimetype='txt/plain', download_name=full_filename)

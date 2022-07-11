@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from model.dto.add_file_record_request import AddFileRecordRequest
 from model.file_record import FileRecord
 from service.file_record_service import FileRecordService
-from service.file_service import FileService
+from service.file_service.file_service import FileService
 from service.transaction_required_service import TransactionRequiredService
 from utils.database_utills import transactional
 
@@ -55,25 +55,12 @@ class FileSyncService(TransactionRequiredService):
                 name = pathlib.Path(record_filename).stem
                 extension = pathlib.Path(record_filename).suffix
                 size = os.path.getsize(real_file_path)
-
-                last_updated = datetime.datetime.fromtimestamp(
-                    os.path.getmtime(real_file_path)
-                )
-                created = datetime.datetime.fromtimestamp(
-                    os.path.getctime(real_file_path)
-                )
-
                 addFileRecordRequest = AddFileRecordRequest(
                     name, extension,
                     size, file_dir, ''
                 )
                 self._file_record_service \
                     .add_new_file_record(addFileRecordRequest)
-        self._file_service.clean_up_dirs(self._upload_dir_path)
-
-    def clean_up_tmp_dir(self):
-        for path in os.listdir(self._tmp_dir_path):
-            os.remove(os.path.join(self._tmp_dir_path, path))
 
     def __get_file_record_path_from_real_path(self, real_filepath: str) -> str:
         path = real_filepath.replace(self._upload_dir_path, '')

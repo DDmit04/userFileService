@@ -2,12 +2,12 @@ from sqlalchemy.orm import Session
 from werkzeug.datastructures import FileStorage
 
 from model.dto.add_file_record_request import AddFileRecordRequest
-from model.dto.fIle_stats_dto import FileStatsDto
 from model.file_record import FileRecord
 from service.file_record_service import FileRecordService
-from service.file_service import FileService
+from service.file_service.file_service import FileService
 from service.transaction_required_service import TransactionRequiredService
 from utils.database_utills import transactional
+from utils.file_utills import get_file_stats
 
 
 class FileServiceFacade(TransactionRequiredService):
@@ -24,16 +24,19 @@ class FileServiceFacade(TransactionRequiredService):
         additional_path_str = self._file_record_service.secure_additional_path(
             additional_path_str
         )
-        fileStats: FileStatsDto = self._file_service.get_tmp_file_stats(file)
+        fileStats = get_file_stats(file)
         addFileRecordRequest: AddFileRecordRequest = AddFileRecordRequest(
             fileStats.filename,
             fileStats.ext,
             fileStats.size,
             additional_path_str,
             comment)
-        created_file: FileRecord = self._file_record_service\
+        created_file = self._file_record_service\
             .add_new_file_record_by_request(addFileRecordRequest)
-        self._file_service.save_file(fileStats, additional_path_str)
+        self._file_service.save_file(
+            file,
+            additional_path_str
+        )
         return created_file
 
     @transactional

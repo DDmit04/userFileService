@@ -37,7 +37,8 @@ class FileRecordService(TransactionRequiredService):
 
     @transactional
     def add_new_file_record_by_request(self,
-                                       add_file_record_request: AddFileRecordRequest) -> FileRecord:
+                                       add_file_record_request:
+                                       AddFileRecordRequest) -> FileRecord:
         new_file_record: FileRecord = self.__create_new_record(
             add_file_record_request)
         return self.__add_file_record(new_file_record)
@@ -118,23 +119,6 @@ class FileRecordService(TransactionRequiredService):
             size=add_record_request.size,
             path=add_record_request.path,
             created_at=current_date_iso,
-            comment=add_record_request.comment
-        )
-        return new_file
-
-    def __create_new_record(self,
-                            add_record_request: AddFileRecordRequest,
-                            creation_time: datetime,
-                            update_time: datetime) -> FileRecord:
-        create_iso = creation_time.isoformat()
-        updated_iso = update_time.isoformat()
-        new_file: FileRecord = FileRecord(
-            name=add_record_request.name,
-            extension=add_record_request.extension,
-            size=add_record_request.size,
-            path=add_record_request.path,
-            created_at=create_iso,
-            updated_at=updated_iso,
             comment=add_record_request.comment
         )
         return new_file
