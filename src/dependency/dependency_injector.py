@@ -2,7 +2,9 @@ import os
 from dataclasses import dataclass
 from typing import Dict
 
+import boto3
 import humanfriendly
+from boto3.resources.base import ServiceResource
 from dotenv import load_dotenv
 from flask import Flask
 from sqlalchemy import create_engine
@@ -12,9 +14,11 @@ from exception.transaction.session_not_found_exception import \
     SessionNotFoundException
 from model.database_init import Base
 from repository.file_record_repository import FileRecordRepository
+from repository.file_repo.minio_file_repository import MinioFileRepository
+from service.file_service.file_service import FileService
+from service.file_service.minio_file_service import MinioFileService
 from service.file_sync_service import FileSyncService
 from service.file_record_service import FileRecordService
-from service.file_service import FileService
 from service.file_service_facade import FileServiceFacade
 
 load_dotenv()
@@ -53,7 +57,10 @@ class DependencyInjector:
             'TMP_DIR_PATH': tmp_dir,
             'UPLOAD_DIR_PATH': upload_dir,
             'DB_URL': db_url,
-            'MAX_CONTENT_LENGTH': max_content_len
+            'MAX_CONTENT_LENGTH': max_content_len,
+            'MINIO_URL': os.environ.get("MINIO_URL", ''),
+            'DEFAULT_BUCKET_NAME': os.environ.get("DEFAULT_BUCKET_NAME",
+                                                  'default')
         }
         return config
 
@@ -76,11 +83,17 @@ class DependencyInjector:
         tmp_dir_path = config['TMP_DIR_PATH']
         upload_dir_path = config['UPLOAD_DIR_PATH']
         path_separator = config['PATH_SEPARATOR']
-        return FileService(
+        return MinioFileService(
             tmp_dir_path,
             upload_dir_path,
-            path_separator
+            path_separator,
+            self.get_file_repository()
         )
+
+    def get_file_repository(self):
+        config = self.get_config()
+        default_bucket = config['DEFAULT_BUCKET_NAME']
+        return MinioFileRepository(self.get_boto_client(), default_bucket)
 
     def get_file_record_repository(self, session_id):
         return FileRecordRepository(
@@ -102,6 +115,12 @@ class DependencyInjector:
             self.get_file_record_repository(session_id),
             path_separator
         )
+
+    def get_boto_client(self) -> ServiceResource:
+        config = self.get_config()
+        minio_url = config['MINIO_URL']
+        s3 = boto3.client('s3', endpoint_url=minio_url)
+        return s3
 
     def get_flask_app(self) -> Flask:
         config = self.get_config()
