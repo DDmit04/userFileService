@@ -37,23 +37,19 @@ class DefaultDependencyInjector:
         root_dir = os.environ.get('ROOT_DIR', '/')
         upload_dir = os.path.join(
             root_dir,
-            os.environ.get('UPLOAD_FOLDER_NAME', '/')
+            os.environ.get('UPLOAD_FOLDER_NAME', '')
         )
         path_separator = os.environ.get('PATH_SEPARATOR', '/')
         db_url = os.getenv('DB_URL')
         max_content_len = humanfriendly.parse_size(
             os.environ.get('MAX_CONTENT_LENGTH', '3M')
         )
-        minio_url = os.environ.get("MINIO_URL", '')
-        default_bucket_name = os.environ.get("DEFAULT_BUCKET_NAME", 'default')
         config = {
             'ROOT_DIR': root_dir,
             'PATH_SEPARATOR': path_separator,
             'UPLOAD_DIR_PATH': upload_dir,
             'DB_URL': db_url,
-            'MAX_CONTENT_LENGTH': max_content_len,
-            'MINIO_URL': minio_url,
-            'DEFAULT_BUCKET_NAME': default_bucket_name
+            'MAX_CONTENT_LENGTH': max_content_len
         }
         return config
 

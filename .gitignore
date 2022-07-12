@@ -1,6 +1,5 @@
 /data/
 /.idea/
-.env
 __pycache__/
 /docker/postgres/data/
 /docker/file_storage/tmp_dir/*

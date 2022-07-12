@@ -1,3 +1,4 @@
+import os
 from typing import Dict
 
 import boto3
@@ -13,7 +14,12 @@ class MinioDependencyInjector(DefaultDependencyInjector):
 
     def get_config(self) -> Dict:
         config = super().get_config()
-        config['UPLOAD_DIR_PATH'] = "/"
+        minio_url = os.environ.get("MINIO_URL", '')
+        default_bucket_name = os.environ.get("DEFAULT_BUCKET_NAME", 'default')
+        config.update({
+            'MINIO_URL': minio_url,
+            'DEFAULT_BUCKET_NAME': default_bucket_name
+        })
         return config
 
     def get_file_service(self) -> FileService:
@@ -34,5 +40,5 @@ class MinioDependencyInjector(DefaultDependencyInjector):
     def get_boto_client(self) -> ServiceResource:
         config = self.get_config()
         minio_url = config['MINIO_URL']
-        s3 = boto3.client('s3', endpoint_url=minio_url)
-        return s3
+        client = boto3.client('s3', endpoint_url=minio_url)
+        return client

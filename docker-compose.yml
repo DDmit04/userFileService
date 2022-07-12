@@ -10,8 +10,8 @@ services:
   minio:
     image: docker.io/bitnami/minio:2022
     environment:
-      MINIO_ROOT_USER: "minio-user"
-      MINIO_ROOT_PASSWORD: "minio-password"
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     volumes:
       - ./docker/minio/data/:/data
 
@@ -19,13 +19,13 @@ services:
     build:
       dockerfile: Dockerfile
     environment:
-      MODE: 'MINIO'
-      MINIO_URL: 'http://minio:9000'
-      DEFAULT_BUCKET_NAME: 'default'
-      DB_URL: "postgresql://file_user:pswd@postgres/file_database"
-      UPLOAD_FOLDER_NAME: "user_files"
-      ROOT_DIR: '/file_storage'
-      PATH_SEPARATOR: "/"
+      MODE: ${MODE}
+      MINIO_URL: ${MINIO_URL}
+      DEFAULT_BUCKET_NAME: ${DEFAULT_BUCKET_NAME}
+      DB_URL: ${DB_URL}
+      UPLOAD_FOLDER_NAME: ${UPLOAD_FOLDER_NAME}
+      ROOT_DIR: ${ROOT_DIR}
+      PATH_SEPARATOR: ${PATH_SEPARATOR}
     volumes:
       - ./docker/minio/credentials:/root/.aws/credentials
       - ./docker/cron/logs/:/logs/
@@ -38,14 +38,14 @@ services:
     build:
       dockerfile: Dockerfile
     environment:
-      MODE: 'MINIO'
-      MINIO_URL: 'http://minio:9000'
-      DEFAULT_BUCKET_NAME: 'default'
-      DB_URL: "postgresql://file_user:pswd@postgres/file_database"
-      UPLOAD_FOLDER_NAME: "user_files"
-      ROOT_DIR: '/file_storage'
-      PATH_SEPARATOR: "/"
-      MAX_CONTENT_LENGTH: 6M
+      MODE: ${MODE}
+      MINIO_URL: ${MINIO_URL}
+      DEFAULT_BUCKET_NAME: ${DEFAULT_BUCKET_NAME}
+      DB_URL: ${DB_URL}
+      UPLOAD_FOLDER_NAME: ${UPLOAD_FOLDER_NAME}
+      ROOT_DIR: ${ROOT_DIR}
+      PATH_SEPARATOR: ${PATH_SEPARATOR}
+      MAX_CONTENT_LENGTH: ${MAX_CONTENT_LENGTH}
     volumes:
       - ./docker/file_storage:/file_storage
       - ./src:/app/src
@@ -55,12 +55,12 @@ services:
     restart: always
     image: postgres:latest
     environment:
-      POSTGRES_DB: "file_database"
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "ps"
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - ./docker/postgres:/docker-entrypoint-initdb.d
-      - ./docker/postgres/data:/var/lib/postgresql/data
+      - ${DATABASE_DATA_PATH}:/var/lib/postgresql/data
     ports:
       - 5432:5432
 
