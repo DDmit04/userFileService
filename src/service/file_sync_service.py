@@ -1,6 +1,5 @@
 import os
 import pathlib
-from datetime import datetime
 
 from sqlalchemy.orm import Session
 
@@ -53,21 +52,23 @@ class FileSyncService(TransactionRequiredService):
                 )
                 name = pathlib.Path(record_filename).stem
                 extension = pathlib.Path(record_filename).suffix
-                size = os.path.getsize(real_file_path)
+                file_stats = self._file_service \
+                    .get_file_stats_by_path(real_file_path)
+                size = file_stats.size
+                last_updated = file_stats.updated
+                created = file_stats.created
                 addFileRecordRequest = AddFileRecordRequest(
                     name, extension,
                     size, file_dir, ''
                 )
-                last_updated = datetime.fromtimestamp(
-                    os.path.getmtime(real_file_path)
+                self._file_record_service.add_new_file_record(
+                    addFileRecordRequest,
+                    created,
+                    last_updated
                 )
-                created = datetime.fromtimestamp(
-                    os.path.getctime(real_file_path)
-                )
-                self._file_record_service \
-                    .add_new_file_record(addFileRecordRequest, created, last_updated)
 
     def __get_file_record_path_from_real_path(self, real_filepath: str) -> str:
+        path = real_filepath
         if real_filepath.startswith(self._upload_dir_path):
             path = real_filepath.replace(self._upload_dir_path, '', 1)
         path = os.path.normpath(path)

@@ -1,9 +1,11 @@
 import os
 import shutil
+from datetime import datetime
 from io import BytesIO
 
 from werkzeug.datastructures import FileStorage
 
+from model.dto.stored_fIle_stats_dto import StoredFileStatsDto
 from repository.file_repo.file_repository import FileRepository
 
 
@@ -44,3 +46,17 @@ class LocalFileRepository(FileRepository):
         with open(filepath, "rb") as file:
             buf = BytesIO(file.read())
             return buf
+
+    def get_file_stats(self, real_file_path) -> StoredFileStatsDto:
+        size = self._file_service.get_file_size_by_path(real_file_path)
+        last_updated = datetime.fromtimestamp(
+            os.path.getmtime(real_file_path)
+        )
+        created = datetime.fromtimestamp(
+            os.path.getctime(real_file_path)
+        )
+        res = StoredFileStatsDto(size, created, last_updated)
+        return res
+
+
+

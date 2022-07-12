@@ -1,9 +1,11 @@
 import io
+from datetime import datetime
 
 from boto3.resources.base import ServiceResource
 from botocore.exceptions import ClientError
 from werkzeug.datastructures import FileStorage
 
+from model.dto.stored_fIle_stats_dto import StoredFileStatsDto
 from repository.file_repo.file_repository import FileRepository
 
 
@@ -73,3 +75,16 @@ class MinioFileRepository(FileRepository):
             Bucket=self._default_bucket_name,
             Key=old_file_path
         )
+
+    def get_file_stats(self, real_file_path) -> StoredFileStatsDto:
+        response = self._boto_client.list_objects_v2(
+            Bucket=self._default_bucket_name,
+            Prefix=real_file_path
+        )
+        print(response['Contents'][0])
+        file_data = response['Contents'][0]
+        size = file_data['Size']
+        last_updated = file_data['LastModified']
+        created = datetime.now()
+        res = StoredFileStatsDto(size, created, last_updated)
+        return res

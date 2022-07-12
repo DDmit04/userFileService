@@ -1,4 +1,7 @@
+import io
 from abc import ABC, abstractmethod
+
+from model.dto.stored_fIle_stats_dto import StoredFileStatsDto
 
 
 class FileRepository(ABC):
@@ -12,7 +15,7 @@ class FileRepository(ABC):
         pass
 
     @abstractmethod
-    def get_all_files_paths(self, from_dir: str):
+    def get_all_files_paths(self, from_dir: str) -> list[str]:
         pass
 
     @abstractmethod
@@ -24,9 +27,13 @@ class FileRepository(ABC):
         pass
 
     @abstractmethod
-    def check_file_exists(self, filepath: str):
+    def check_file_exists(self, filepath: str) -> bool:
         pass
 
     @abstractmethod
-    def load_file(self, filepath):
+    def load_file(self, filepath) -> io.BytesIO:
+        pass
+
+    @abstractmethod
+    def get_file_stats(self, real_file_path) -> StoredFileStatsDto:
         pass

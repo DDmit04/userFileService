@@ -5,6 +5,7 @@ from abc import ABC
 from werkzeug.datastructures import FileStorage
 
 from exception.file.file_not_found_exception import FileNotFoundException
+from model.dto.stored_fIle_stats_dto import StoredFileStatsDto
 from model.file_record import FileRecord
 from repository.file_repo.file_repository import FileRepository
 
@@ -84,3 +85,5 @@ class FileService(ABC):
     def get_all_filepaths(self, upload_dir_path: str):
         return self.file_repository.get_all_files_paths(upload_dir_path)
 
+    def get_file_stats_by_path(self, real_file_path) -> StoredFileStatsDto:
+        return self.file_repository.get_file_stats(real_file_path)
