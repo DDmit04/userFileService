@@ -5,7 +5,6 @@ from typing import Dict
 import boto3
 import humanfriendly
 from boto3.resources.base import ServiceResource
-from dotenv import load_dotenv
 from flask import Flask
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
@@ -14,14 +13,12 @@ from exception.transaction.session_not_found_exception import \
     SessionNotFoundException
 from model.database_init import Base
 from repository.file_record_repository import FileRecordRepository
-from repository.file_repo.minio_file_repository import MinioFileRepository
-from service.file_service.file_service import FileService
-from service.file_service.minio_file_service import MinioFileService
-from service.file_sync_service import FileSyncService
+from repository.file_repo.local_file_repository import LocalFileRepository
 from service.file_record_service import FileRecordService
+from service.file_service.file_service import FileService
+from service.file_service.local_file_service import LocalFileService
 from service.file_service_facade import FileServiceFacade
-
-load_dotenv()
+from service.file_sync_service import FileSyncService
 
 
 @dataclass
@@ -30,48 +27,42 @@ class SessionRecord:
     session: Session
 
 
-class DependencyInjector:
+class DefaultDependencyInjector:
 
     def __init__(self):
         super().__init__()
         self.sessions_pool: list[SessionRecord] = []
 
     def get_config(self) -> Dict:
-        root_dir = os.environ.get('ROOT_DIR', '/file_root')
+        root_dir = os.environ.get('ROOT_DIR', '/')
         upload_dir = os.path.join(
             root_dir,
-            os.environ.get('UPLOAD_FOLDER_NAME', '/files')
-        )
-        tmp_dir = os.path.join(
-            root_dir,
-            os.environ.get('TMP_FOLDER_NAME', '/tmp')
+            os.environ.get('UPLOAD_FOLDER_NAME', '/')
         )
         path_separator = os.environ.get('PATH_SEPARATOR', '/')
         db_url = os.getenv('DB_URL')
         max_content_len = humanfriendly.parse_size(
             os.environ.get('MAX_CONTENT_LENGTH', '3M')
         )
+        minio_url = os.environ.get("MINIO_URL", '')
+        default_bucket_name = os.environ.get("DEFAULT_BUCKET_NAME", 'default')
         config = {
             'ROOT_DIR': root_dir,
             'PATH_SEPARATOR': path_separator,
-            'TMP_DIR_PATH': tmp_dir,
             'UPLOAD_DIR_PATH': upload_dir,
             'DB_URL': db_url,
             'MAX_CONTENT_LENGTH': max_content_len,
-            'MINIO_URL': os.environ.get("MINIO_URL", ''),
-            'DEFAULT_BUCKET_NAME': os.environ.get("DEFAULT_BUCKET_NAME",
-                                                  'default')
+            'MINIO_URL': minio_url,
+            'DEFAULT_BUCKET_NAME': default_bucket_name
         }
         return config
 
     def get_file_sync_service(self, session_id: str) -> FileSyncService:
         config = self.get_config()
         upload_dir_path = config['UPLOAD_DIR_PATH']
-        tmp_dir_path = config['TMP_DIR_PATH']
         path_separator = config['PATH_SEPARATOR']
         return FileSyncService(
             self.get_database_session(session_id),
-            tmp_dir_path,
             upload_dir_path,
             path_separator,
             self.get_file_record_service(session_id),
@@ -80,20 +71,16 @@ class DependencyInjector:
 
     def get_file_service(self) -> FileService:
         config = self.get_config()
-        tmp_dir_path = config['TMP_DIR_PATH']
         upload_dir_path = config['UPLOAD_DIR_PATH']
         path_separator = config['PATH_SEPARATOR']
-        return MinioFileService(
-            tmp_dir_path,
+        return LocalFileService(
             upload_dir_path,
             path_separator,
             self.get_file_repository()
         )
 
     def get_file_repository(self):
-        config = self.get_config()
-        default_bucket = config['DEFAULT_BUCKET_NAME']
-        return MinioFileRepository(self.get_boto_client(), default_bucket)
+        return LocalFileRepository()
 
     def get_file_record_repository(self, session_id):
         return FileRecordRepository(
