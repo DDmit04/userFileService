@@ -5,9 +5,9 @@ import boto3
 from boto3.resources.base import ServiceResource
 
 from dependency.default_dependency_injector import DefaultDependencyInjector
-from repository.file_repo.minio_file_repository import MinioFileRepository
+from repository.file_repo.boto_file_repository import MinioFileRepository
+from service.file_service.boto_file_service import MinioFileService
 from service.file_service.file_service import FileService
-from service.file_service.minio_file_service import MinioFileService
 
 
 class MinioDependencyInjector(DefaultDependencyInjector):

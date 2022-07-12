@@ -2,9 +2,7 @@ import os
 from dataclasses import dataclass
 from typing import Dict
 
-import boto3
 import humanfriendly
-from boto3.resources.base import ServiceResource
 from flask import Flask
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
@@ -98,12 +96,6 @@ class DefaultDependencyInjector:
             self.get_file_record_repository(session_id),
             path_separator
         )
-
-    def get_boto_client(self) -> ServiceResource:
-        config = self.get_config()
-        minio_url = config['MINIO_URL']
-        s3 = boto3.client('s3', endpoint_url=minio_url)
-        return s3
 
     def get_flask_app(self) -> Flask:
         config = self.get_config()

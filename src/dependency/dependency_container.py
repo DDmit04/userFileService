@@ -1,7 +1,7 @@
 import os
 
+from dependency.boto_dependency_injector import MinioDependencyInjector
 from dependency.default_dependency_injector import DefaultDependencyInjector
-from dependency.minio_dependency_injector import MinioDependencyInjector
 
 mode = os.environ.get("MODE", "DEFAULT")
 di_container = DefaultDependencyInjector()
