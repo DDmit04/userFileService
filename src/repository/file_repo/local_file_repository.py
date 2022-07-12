@@ -1,5 +1,6 @@
 import os
 import shutil
+from io import BytesIO
 
 from werkzeug.datastructures import FileStorage
 
@@ -15,8 +16,17 @@ class LocalFileRepository(FileRepository):
     def delete_file(self, path: str):
         os.remove(path)
 
-    def get_all_files(self):
-        pass
+    def get_all_files_paths(self, from_dir):
+        res = []
+        if not os.path.exists(from_dir):
+            return []
+        for path in os.listdir(from_dir):
+            if os.path.isfile(os.path.join(from_dir, path)):
+                res.append(os.path.join(from_dir, path))
+            else:
+                res += self.get_all_files_paths(
+                    os.path.join(from_dir, path))
+        return res
 
     def update_file_path(self, old_file_path: str, new_file_path: str):
         os.makedirs(os.path.dirname(new_file_path), exist_ok=True)
@@ -31,5 +41,6 @@ class LocalFileRepository(FileRepository):
         return file_exists
 
     def load_file(self, filepath):
-        file = open(filepath, 'r')
-        return file
+        with open(filepath, "rb") as file:
+            buf = BytesIO(file.read())
+            return buf

@@ -12,12 +12,10 @@ from repository.file_repo.file_repository import FileRepository
 class FileService(ABC):
 
     def __init__(self,
-                 tmp_dir: str,
                  upload_dir: str,
                  path_separator: str,
                  file_repository: FileRepository):
         super().__init__()
-        self.tmp_dir = tmp_dir
         self.path_separator = path_separator
         self.upload_dir = upload_dir
         self.file_repository = file_repository
@@ -63,7 +61,7 @@ class FileService(ABC):
 
     def get_filepath(self, additional_path: str, filename: str) -> str:
         additional_folders = additional_path.split(self.path_separator)
-        filepath = ""
+        filepath = self.upload_dir
         for additional_folder in additional_folders:
             filepath = os.path.join(filepath, additional_folder)
         filepath = os.path.join(filepath, filename)
@@ -78,7 +76,11 @@ class FileService(ABC):
         return filepath
 
     def get_file(self, path, full_filename) -> io.BytesIO:
+        self.file_repository.get_all_files_paths()
         filepath = self.get_filepath_check_exists(path, full_filename)
         file = self.file_repository.load_file(filepath)
         return file
+
+    def get_all_filepaths(self, upload_dir_path: str):
+        return self.file_repository.get_all_files_paths(upload_dir_path)
 

@@ -12,9 +12,6 @@ services:
     environment:
       MINIO_ROOT_USER: "minio-user"
       MINIO_ROOT_PASSWORD: "minio-password"
-    ports:
-      - 9000:9000
-      - 9001:9001
     volumes:
       - ./docker/minio/data/:/data
 
@@ -22,14 +19,11 @@ services:
     build:
       dockerfile: Dockerfile
     environment:
+      MODE: 'MINIO'
+      MINIO_URL: 'http://minio:9000'
+      DEFAULT_BUCKET_NAME: 'default'
       DB_URL: "postgresql://file_user:pswd@postgres/file_database"
-
-      MINIO_SERVER_HOST: "minio-server"
-      MINIO_SERVER_ACCESS_KEY: "minio-access-key"
-      MINIO_SERVER_SECRET_KEY: "minio-secret-key"
-
       UPLOAD_FOLDER_NAME: "user_files"
-      TMP_FOLDER_NAME: "tmp_dir"
       ROOT_DIR: '/file_storage'
       PATH_SEPARATOR: "/"
     volumes:
@@ -44,11 +38,11 @@ services:
     build:
       dockerfile: Dockerfile
     environment:
+      MODE: 'MINIO'
       MINIO_URL: 'http://minio:9000'
       DEFAULT_BUCKET_NAME: 'default'
       DB_URL: "postgresql://file_user:pswd@postgres/file_database"
       UPLOAD_FOLDER_NAME: "user_files"
-      TMP_FOLDER_NAME: "tmp_dir"
       ROOT_DIR: '/file_storage'
       PATH_SEPARATOR: "/"
       MAX_CONTENT_LENGTH: 6M

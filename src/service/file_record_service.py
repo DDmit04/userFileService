@@ -1,10 +1,7 @@
 from datetime import datetime
-from typing import Dict
 
 from sqlalchemy.orm import Session
 
-from exception.records.file_recordId_not_found_exception import \
-    FileRecordIdNotFoundException
 from exception.records.file_record_path_already_exists_exception import \
     FileRecordPathAlreadyExistsException
 from model.dto.add_file_record_request import AddFileRecordRequest
@@ -109,16 +106,21 @@ class FileRecordService(TransactionRequiredService):
             self._file_record_repo.save_file_record(new_file_record)
             return new_file_record
 
-    def __create_new_record(self, add_record_request: AddFileRecordRequest) \
-            -> FileRecord:
+    def __create_new_record(self, add_record_request: AddFileRecordRequest,
+                            created: datetime = None,
+                            updated: datetime = None) -> FileRecord:
+
         current_date = datetime.now()
         current_date_iso = current_date.isoformat()
+        if created is not None:
+            current_date_iso = created.isoformat()
         new_file: FileRecord = FileRecord(
             name=add_record_request.name,
             extension=add_record_request.extension,
             size=add_record_request.size,
             path=add_record_request.path,
             created_at=current_date_iso,
+            updated_at=updated,
             comment=add_record_request.comment
         )
         return new_file

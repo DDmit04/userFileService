@@ -1,5 +1,3 @@
-import uuid
-
 from flask import Blueprint, request, Response
 from flask_expects_json import expects_json
 

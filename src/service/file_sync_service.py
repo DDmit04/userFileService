@@ -16,13 +16,11 @@ class FileSyncService(TransactionRequiredService):
 
     def __init__(self,
                  session: Session,
-                 tmp_dir_filepath,
                  upload_dir_path: str,
                  path_separator: str,
                  file_record_service: FileRecordService,
                  file_service: FileService):
         super().__init__(session)
-        self._tmp_dir_path = tmp_dir_filepath
         self._upload_dir_path = upload_dir_path
         self._path_separator = path_separator
         self._file_record_service = file_record_service
@@ -32,7 +30,8 @@ class FileSyncService(TransactionRequiredService):
     def sync_storage_data(self):
         all_files_records: list[FileRecord] = self._file_record_service \
             .list_files_records()
-        real_files_paths = self.__get_real_filepaths(self._upload_dir_path)
+        real_files_paths = self._file_service.get_all_filepaths(
+            self._upload_dir_path)
         for file_record in all_files_records:
             record_filename = file_record.name + file_record.extension
             record_path = file_record.path
@@ -59,24 +58,20 @@ class FileSyncService(TransactionRequiredService):
                     name, extension,
                     size, file_dir, ''
                 )
+                last_updated = datetime.fromtimestamp(
+                    os.path.getmtime(real_file_path)
+                )
+                created = datetime.fromtimestamp(
+                    os.path.getctime(real_file_path)
+                )
                 self._file_record_service \
-                    .add_new_file_record(addFileRecordRequest)
+                    .add_new_file_record(addFileRecordRequest, created, last_updated)
 
     def __get_file_record_path_from_real_path(self, real_filepath: str) -> str:
-        path = real_filepath.replace(self._upload_dir_path, '')
+        if real_filepath.startswith(self._upload_dir_path):
+            path = real_filepath.replace(self._upload_dir_path, '', 1)
         path = os.path.normpath(path)
         path_elements = path.split(os.sep)
         path = self._path_separator.join(path_elements)
         path_head = os.path.split(path)[0]
         return path_head
-
-    def __get_real_filepaths(self, dir_path: str):
-        res = []
-        if not os.path.exists(dir_path):
-            os.makedirs(dir_path, exist_ok=True)
-        for path in os.listdir(dir_path):
-            if os.path.isfile(os.path.join(dir_path, path)):
-                res.append(os.path.join(dir_path, path))
-            else:
-                res += self.__get_real_filepaths(os.path.join(dir_path, path))
-        return res
