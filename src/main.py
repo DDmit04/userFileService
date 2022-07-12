@@ -3,6 +3,10 @@ from botocore.exceptions import ClientError
 from app_factory import setup_app
 from dependency.dependency_container import di_container
 
+sync_service = di_container.get_file_sync_service("")
+sync_service.sync_storage_data()
+di_container.close_database_session("")
+
 app = di_container.get_flask_app()
 app = setup_app(app)
 
