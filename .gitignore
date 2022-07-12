@@ -5,5 +5,5 @@ __pycache__/
 /docker/file_storage/tmp_dir/*
 /docker/file_storage/user_files/*
 /docker/cron/logs/*
-/docker/minio/data/*
-/docker/minio/credentials
+/docker/boto/data/*
+/docker/boto/credentials

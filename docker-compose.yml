@@ -1,7 +1,3 @@
-#Идентификатор ключа:
-#YCAJE82N0tZdfgJnkdguNw2He
-#Ваш секретный ключ:
-#YCMSjCJoVXXEUIR55W5ArfALVDc7BheNMsae9HKX
 services:
   nginx:
     image: nginx:latest
@@ -17,7 +13,7 @@ services:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     volumes:
-      - ./docker/minio/data/:/data
+      - ./docker/boto/data/:/data
 
   app-sync:
     build:
@@ -32,7 +28,7 @@ services:
       ROOT_DIR: ${ROOT_DIR}
       PATH_SEPARATOR: ${PATH_SEPARATOR}
     volumes:
-      - ./docker/minio/credentials:/root/.aws/credentials
+      - ./docker/boto/credentials:/root/.aws/credentials
       - ./docker/cron/logs/:/logs/
       - ./docker/file_storage:/file_storage
       - ./src:/app/src

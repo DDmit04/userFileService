@@ -8,7 +8,7 @@ RUN touch /logs/err.log
 RUN crontab /app/mycron
 
 RUN mkdir -p /root/.aws/
-COPY docker/minio/credentials /root/.aws/credentials
+COPY docker/boto/credentials /root/.aws/credentials
 
 WORKDIR /app
 COPY . /app
