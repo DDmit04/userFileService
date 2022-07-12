@@ -14,10 +14,12 @@ class MinioDependencyInjector(DefaultDependencyInjector):
 
     def get_config(self) -> Dict:
         config = super().get_config()
-        minio_url = os.environ.get("MINIO_URL", '')
+        boto_url = os.environ.get("BOTO_URL", '')
+        boto_profile = os.environ.get("BOTO_PROFILE", 'default')
         default_bucket_name = os.environ.get("DEFAULT_BUCKET_NAME", 'default')
         config.update({
-            'MINIO_URL': minio_url,
+            'BOTO_URL': boto_url,
+            'BOTO_PROFILE': boto_profile,
             'DEFAULT_BUCKET_NAME': default_bucket_name
         })
         return config
@@ -39,6 +41,8 @@ class MinioDependencyInjector(DefaultDependencyInjector):
 
     def get_boto_client(self) -> ServiceResource:
         config = self.get_config()
-        minio_url = config['MINIO_URL']
-        client = boto3.client('s3', endpoint_url=minio_url)
+        boto_url = config['BOTO_URL']
+        boto_profile = config['BOTO_PROFILE']
+        session = boto3.Session(profile_name=boto_profile)
+        client = session.client('s3', endpoint_url=boto_url)
         return client
