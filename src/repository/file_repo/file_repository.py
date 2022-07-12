@@ -12,7 +12,7 @@ class FileRepository(ABC):
         pass
 
     @abstractmethod
-    def get_all_files(self):
+    def get_all_files_paths(self, from_dir: str):
         pass
 
     @abstractmethod
@@ -25,7 +25,7 @@ class FileRepository(ABC):
 
     @abstractmethod
     def check_file_exists(self, filepath: str):
-        return True
+        pass
 
     @abstractmethod
     def load_file(self, filepath):

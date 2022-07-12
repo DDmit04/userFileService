@@ -1,8 +1,6 @@
 import io
-from io import BytesIO
 
-import boto3 as boto3
-from boto3.resources.base import ServiceResource, ResourceMeta
+from boto3.resources.base import ServiceResource
 from botocore.exceptions import ClientError
 from werkzeug.datastructures import FileStorage
 
@@ -23,20 +21,24 @@ class MinioFileRepository(FileRepository):
 
     def delete_file(self, path: str):
         self._boto_client.delete_object(
-            Bucket=self._default_bucket_name, Key=path
+            Bucket=self._default_bucket_name,
+            Key=path
         )
 
-    def get_all_files(self):
+    def get_all_files_paths(self, from_dir: str) -> list[str]:
         response = self._boto_client.list_objects(
             Bucket=self._default_bucket_name,
-            Prefix="/")
-        list(map(lambda content: content['key'], response.get('Contents', [])))
+            Prefix=from_dir
+        )
+        result = response.get('Contents', [])
+        all_filepaths = list(map(lambda content: content['Key'], result))
+        return all_filepaths
 
     def update_file_path(self, old_file_path: str, new_file_path: str):
-        pass
+        self.__move_file(old_file_path, new_file_path)
 
     def update_filename(self, old_file_path: str, new_file_path: str):
-        pass
+        self.__move_file(old_file_path, new_file_path)
 
     def check_file_exists(self, filepath: str):
         try:
@@ -57,3 +59,17 @@ class MinioFileRepository(FileRepository):
         )
         return file
 
+    def __move_file(self, old_file_path: str, new_file_path: str):
+        copy_source = {
+            'Bucket': self._default_bucket_name,
+            'Key': old_file_path
+        }
+        self._boto_client.copy_object(
+            Bucket=self._default_bucket_name,
+            CopySource=copy_source,
+            Key=new_file_path
+        )
+        self._boto_client.delete_object(
+            Bucket=self._default_bucket_name,
+            Key=old_file_path
+        )
