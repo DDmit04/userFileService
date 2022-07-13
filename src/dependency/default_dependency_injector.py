@@ -1,15 +1,11 @@
 import os
-from dataclasses import dataclass
 from typing import Dict
 
 import humanfriendly
 from flask import Flask
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import Session
 
-from exception.transaction.session_not_found_exception import \
-    SessionNotFoundException
-from model.database_init import Base
+from dependency.database_session_factory import DatabaseSessionFactory
 from repository.file_record_repository import FileRecordRepository
 from repository.file_repo.local_file_repository import LocalFileRepository
 from service.file_record_service import FileRecordService
@@ -19,17 +15,13 @@ from service.file_service_facade import FileServiceFacade
 from service.file_sync_service import FileSyncService
 
 
-@dataclass
-class SessionRecord:
-    session_id: str
-    session: Session
-
-
 class DefaultDependencyInjector:
 
     def __init__(self):
         super().__init__()
-        self.sessions_pool: list[SessionRecord] = []
+        config = self.get_config()
+        db_url: str = config['DB_URL']
+        self.database_session_factory = DatabaseSessionFactory(db_url)
 
     def get_config(self) -> Dict:
         root_dir = os.environ.get('ROOT_DIR', '/')
@@ -107,36 +99,7 @@ class DefaultDependencyInjector:
         return app
 
     def get_database_session(self, session_id: str) -> Session:
-        existing_session_record: SessionRecord = self \
-            .__find_session_by_id(session_id)
-        if existing_session_record is None:
-            session = self.__create_new_database_session()
-            self.sessions_pool.append(SessionRecord(session_id, session))
-            session.begin()
-            return session
-        return existing_session_record.session
+        return self.database_session_factory.get_session(session_id)
 
     def close_database_session(self, session_id):
-        existing_session_record: SessionRecord = self \
-            .__find_session_by_id(session_id)
-        if existing_session_record is None:
-            raise SessionNotFoundException()
-        session: Session = existing_session_record.session
-        session.commit()
-        session.close()
-        self.sessions_pool.remove(existing_session_record)
-
-    def __create_new_database_session(self) -> Session:
-        config = self.get_config()
-        db_url: str = config['DB_URL']
-        engine: str = create_engine(db_url, echo=True)
-        Base.metadata.create_all(engine)
-        session_maker: sessionmaker = sessionmaker(bind=engine)
-        session: Session = session_maker()
-        return session
-
-    def __find_session_by_id(self, session_id) -> SessionRecord:
-        for existing_session in self.sessions_pool:
-            if existing_session.session_id == session_id:
-                return existing_session
-        return None
+        return self.database_session_factory.close_session(session_id)
