@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from typing import Dict
 
 import humanfriendly
@@ -34,12 +35,22 @@ class DefaultDependencyInjector:
         max_content_len = humanfriendly.parse_size(
             os.environ.get('MAX_CONTENT_LENGTH', '3M')
         )
+        jwt_lifetime = humanfriendly.parse_timespan(
+            os.environ.get("JWT_LIFETIME_SECONDS", '15m')
+        )
+        refresh_lifetime = humanfriendly.parse_timespan(
+            os.environ.get("REFRESH_LIFETIME_SECONDS", '7d')
+        )
+        jwt_Secret = os.environ.get('JWT_SECRET', '')
         config = {
             'ROOT_DIR': root_dir,
             'PATH_SEPARATOR': path_separator,
             'UPLOAD_DIR_PATH': upload_dir,
             'DB_URL': db_url,
-            'MAX_CONTENT_LENGTH': max_content_len
+            'MAX_CONTENT_LENGTH': max_content_len,
+            "JWT_LIFETIME_SECONDS": jwt_lifetime,
+            "REFRESH_LIFETIME_SECONDS": refresh_lifetime,
+            "JWT_SECRET": jwt_Secret
         }
         return config
 
@@ -94,6 +105,11 @@ class DefaultDependencyInjector:
         app = Flask(__name__)
         app.config['SQLALCHEMY_DATABASE_URI'] = config['DB_URL']
         app.config['MAX_CONTENT_LENGTH'] = config['MAX_CONTENT_LENGTH']
+        app.config["JWT_SECRET_KEY"] = config['JWT_SECRET']
+        app.config["JWT_ACCESS_TOKEN_EXPIRES"] = \
+            timedelta(seconds=config['JWT_LIFETIME_SECONDS'])
+        app.config["JWT_REFRESH_TOKEN_EXPIRES"] = \
+            timedelta(seconds=config['REFRESH_LIFETIME_SECONDS'])
         app_ctx = app.app_context()
         app_ctx.push()
         return app

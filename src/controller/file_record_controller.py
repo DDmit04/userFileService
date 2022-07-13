@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_expects_json import expects_json
+from flask_jwt_extended import jwt_required
 
 from dependency.dependency_container import di_container
 from model.file_record import FileRecord
@@ -12,6 +13,7 @@ file_record_controller_blueprint = Blueprint('file_record_controller',
 
 
 @file_record_controller_blueprint.route('/', methods=["GET"])
+@jwt_required()
 @exception_handle
 @require_session
 def get_file_records_list(session_id: str):
@@ -23,6 +25,7 @@ def get_file_records_list(session_id: str):
 
 
 @file_record_controller_blueprint.route('/<file_id>', methods=["GET"])
+@jwt_required()
 @exception_handle
 @require_session
 def get_file_record(session_id: str, file_id: int):
@@ -34,6 +37,7 @@ def get_file_record(session_id: str, file_id: int):
 
 
 @file_record_controller_blueprint.route('/level', methods=["GET"])
+@jwt_required()
 @exception_handle
 @expects_json(file_level_search_schema)
 @require_session

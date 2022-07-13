@@ -48,6 +48,9 @@ services:
       ROOT_DIR: ${ROOT_DIR}
       PATH_SEPARATOR: ${PATH_SEPARATOR}
       MAX_CONTENT_LENGTH: ${MAX_CONTENT_LENGTH}
+      JWT_LIFETIME: ${JWT_LIFETIME}
+      REFRESH_LIFETIME: ${REFRESH_LIFETIME}
+      JWT_SECRET: ${JWT_SECRET}
     volumes:
       - ./docker/file_storage:/file_storage
       - ./src:/app/src

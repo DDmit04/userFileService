@@ -1,4 +1,5 @@
 from flask import Blueprint, request, Response, send_file, jsonify
+from flask_jwt_extended import jwt_required
 from werkzeug.datastructures import FileStorage
 
 from dependency.dependency_container import di_container
@@ -13,6 +14,7 @@ file_controller_blueprint = Blueprint('file_controller', __name__)
 
 
 @file_controller_blueprint.route('/', methods=["POST"])
+@jwt_required()
 @exception_handle
 @require_session
 def add_file(session_id: str):
@@ -33,6 +35,7 @@ def add_file(session_id: str):
 
 
 @file_controller_blueprint.route('/<file_id>', methods=["DELETE"])
+@jwt_required()
 @exception_handle
 @require_session
 def delete_file(session_id: str, file_id: int):
@@ -43,6 +46,7 @@ def delete_file(session_id: str, file_id: int):
 
 
 @file_controller_blueprint.route('/<file_id>/download', methods=["GET"])
+@jwt_required()
 @exception_handle
 @require_session
 def download_file(session_id: str, file_id: int):

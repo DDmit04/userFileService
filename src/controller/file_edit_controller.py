@@ -1,5 +1,6 @@
 from flask import Blueprint, request, Response
 from flask_expects_json import expects_json
+from flask_jwt_extended import jwt_required
 
 from dependency.dependency_container import di_container
 from model.requests.request_schemas import file_comment_update_schema, \
@@ -11,6 +12,7 @@ file_edit_controller_blueprint = Blueprint('file_edit_controller', __name__)
 
 
 @file_edit_controller_blueprint.route('<file_id>/comment', methods=["PATCH"])
+@jwt_required()
 @exception_handle
 @expects_json(file_comment_update_schema)
 @require_session
@@ -23,6 +25,7 @@ def update_file_comment(session_id: str, file_id: int):
 
 
 @file_edit_controller_blueprint.route('<file_id>/name', methods=["PATCH"])
+@jwt_required()
 @exception_handle
 @expects_json(filename_update_schema)
 @require_session
@@ -34,6 +37,7 @@ def update_filename(session_id: str, file_id: int):
 
 
 @file_edit_controller_blueprint.route('<file_id>/path', methods=["PATCH"])
+@jwt_required()
 @exception_handle
 @expects_json(filepath_update_schema)
 @require_session
