@@ -40,16 +40,16 @@
 
 Приложение будет ожидать запросов по адресу **localhost:80**
 
-### Работа с MinIO
+### Работа MinIO
 
-- Переименовать файл 
-'**docker/minio/credentials.default**' в '**docker/minio/credentials**'
-- Использовать **.env** конфигурацию или **.env.minio**
+- Внести в файл '**docker/minio/credentials**' ваши '**aws_access_key_id**' и 
+  '**aws_secret_access_key**' в профиль '**[default]**' (или оставить по 
+  умолчанию)
+- Использовать **.env.minio** конфигурацию
+
 ### Работа Yandex cloud storage
 
-- Нужно переименовать файл '**docker/minio/credentials.default**' в 
-  '**docker/minio/credentials**'
-- Вписать в него ваши данные '**Key_ID**' и 
-  '**Secret_key**'
+- Внести в файл '**docker/minio/credentials**' ваши '**aws_access_key_id**' и 
+  '**aws_secret_access_key**' в профиль '**[yandex]**'
 - Использовать **.env.yandex** конфигурацию
 
