@@ -32,3 +32,13 @@ class FileRecord(Base):
 
     def get_full_filename(self) -> str:
         return self.name + self.extension
+
+    def __hash__(self):
+        return hash((self.id, self.name, self.extension, self.path))
+
+    def __eq__(self, other):
+        try:
+            return (self.id, self.name, self.extension, self.path) \
+                   == (other.id, other.name, other.extension, other.path)
+        except AttributeError:
+            return NotImplemented

@@ -3,7 +3,10 @@ from flask_jwt_extended import JWTManager
 
 from app_factory import setup_app
 from dependency.dependency_container import di_container
+from test.file_service_test import FileServiceTest
 
+t = FileServiceTest()
+t.run_all()
 
 def bucket_exists(client, bucket_name):
     try:

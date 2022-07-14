@@ -27,10 +27,42 @@ class FileSyncService(TransactionRequiredService):
 
     @transactional
     def sync_storage_data(self):
-        all_files_records: list[FileRecord] = self._file_record_service \
-            .list_files_records()
+        all_files_records: list[FileRecord] = \
+            self._file_record_service.list_files_records()
         real_files_paths = self._file_service.get_all_filepaths(
-            self._upload_dir_path)
+            self._upload_dir_path
+        )
+        real_files_paths = self.__remove_orphan_file_records(
+            all_files_records,
+            real_files_paths
+        )
+        if len(real_files_paths) != 0:
+            self.__add_existing_files_records(real_files_paths)
+
+    def __add_existing_files_records(self, real_files_paths):
+        for real_file_path in real_files_paths:
+            record_filename = os.path.basename(real_file_path)
+            file_dir = self.__get_file_record_path_from_real_path(
+                real_file_path
+            )
+            name = pathlib.Path(record_filename).stem
+            extension = pathlib.Path(record_filename).suffix
+            file_stats = self._file_service \
+                .get_file_stats_by_path(real_file_path)
+            size = file_stats.size
+            last_updated = file_stats.updated
+            created = file_stats.created
+            addFileRecordRequest = AddFileRecordRequest(
+                name, extension,
+                size, file_dir
+            )
+            self._file_record_service.add_new_file_record(
+                addFileRecordRequest,
+                created,
+                last_updated
+            )
+
+    def __remove_orphan_file_records(self, all_files_records, real_files_paths):
         for file_record in all_files_records:
             record_filename = file_record.name + file_record.extension
             record_path = file_record.path
@@ -44,28 +76,7 @@ class FileSyncService(TransactionRequiredService):
                 self._file_record_service.delete_file_record(record_id)
             else:
                 real_files_paths.remove(record_full_path)
-        if len(real_files_paths) != 0:
-            for real_file_path in real_files_paths:
-                record_filename = os.path.basename(real_file_path)
-                file_dir = self.__get_file_record_path_from_real_path(
-                    real_file_path
-                )
-                name = pathlib.Path(record_filename).stem
-                extension = pathlib.Path(record_filename).suffix
-                file_stats = self._file_service \
-                    .get_file_stats_by_path(real_file_path)
-                size = file_stats.size
-                last_updated = file_stats.updated
-                created = file_stats.created
-                addFileRecordRequest = AddFileRecordRequest(
-                    name, extension,
-                    size, file_dir, ''
-                )
-                self._file_record_service.add_new_file_record(
-                    addFileRecordRequest,
-                    created,
-                    last_updated
-                )
+        return real_files_paths
 
     def __get_file_record_path_from_real_path(self, real_filepath: str) -> str:
         path = real_filepath

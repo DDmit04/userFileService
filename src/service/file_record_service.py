@@ -8,12 +8,14 @@ from model.dto.add_file_record_request import AddFileRecordRequest
 from model.file_record import FileRecord
 from repository.file_record_repository import FileRecordRepository
 from service.transaction_required_service import TransactionRequiredService
+from utils.data_utils import create_new_file_record
 from utils.database_utills import transactional
 
 
 class FileRecordService(TransactionRequiredService):
 
-    def __init__(self, session: Session,
+    def __init__(self,
+                 session: Session,
                  file_record_repo: FileRecordRepository,
                  path_separator: str):
         super().__init__(session)
@@ -25,7 +27,7 @@ class FileRecordService(TransactionRequiredService):
                             add_file_record_request: AddFileRecordRequest,
                             creation_time: datetime,
                             update_time: datetime) -> FileRecord:
-        new_file_record: FileRecord = self.__create_new_record(
+        new_file_record: FileRecord = create_new_file_record(
             add_file_record_request,
             creation_time,
             update_time
@@ -36,7 +38,7 @@ class FileRecordService(TransactionRequiredService):
     def add_new_file_record_by_request(self,
                                        add_file_record_request:
                                        AddFileRecordRequest) -> FileRecord:
-        new_file_record: FileRecord = self.__create_new_record(
+        new_file_record: FileRecord = create_new_file_record(
             add_file_record_request)
         return self.__add_file_record(new_file_record)
 
@@ -71,18 +73,18 @@ class FileRecordService(TransactionRequiredService):
 
     @transactional
     def get_records_on_dir(self, dir_level: str) -> list[FileRecord]:
-        dir_level = self.secure_additional_path(dir_level)
+        dir_level = self.__secure_additional_path(dir_level)
         file_records = self._file_record_repo.get_file_records_with_path(
             dir_level
         )
         return file_records
 
     @transactional
-    def get_record_by_id(self, file_id) -> FileRecord:
+    def get_record_by_id(self, file_id: int) -> FileRecord:
         file_record = self._file_record_repo.get_file_record_by_id(file_id)
         return file_record
 
-    def secure_additional_path(self, path: str):
+    def __secure_additional_path(self, path: str):
         path_separator = self._path_separator
         if not path.startswith(path_separator):
             path = f'/{path}'
@@ -105,22 +107,3 @@ class FileRecordService(TransactionRequiredService):
         else:
             self._file_record_repo.save_file_record(new_file_record)
             return new_file_record
-
-    def __create_new_record(self, add_record_request: AddFileRecordRequest,
-                            created: datetime = None,
-                            updated: datetime = None) -> FileRecord:
-
-        current_date = datetime.now()
-        current_date_iso = current_date.isoformat()
-        if created is not None:
-            current_date_iso = created.isoformat()
-        new_file: FileRecord = FileRecord(
-            name=add_record_request.name,
-            extension=add_record_request.extension,
-            size=add_record_request.size,
-            path=add_record_request.path,
-            created_at=current_date_iso,
-            updated_at=updated,
-            comment=add_record_request.comment
-        )
-        return new_file

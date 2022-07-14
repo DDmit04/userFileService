@@ -68,22 +68,14 @@ class FileService(ABC):
         filepath = os.path.join(filepath, filename)
         return filepath
 
-    def get_filepath_check_exists(self, additional_path: str, filename: str) \
-            -> str:
-        filepath = self.get_filepath(additional_path, filename)
-        file_exists = self.file_repository.check_file_exists(filepath)
-        if not file_exists:
-            raise FileNotFoundException(filepath)
-        return filepath
-
-    def get_file(self, path, full_filename) -> io.BytesIO:
-        self.file_repository.get_all_files_paths()
+    def get_file(self, path: str, full_filename: str) -> io.BytesIO:
         filepath = self.get_filepath_check_exists(path, full_filename)
         file = self.file_repository.load_file(filepath)
         return file
 
-    def get_all_filepaths(self, upload_dir_path: str):
+    def get_all_filepaths(self, upload_dir_path: str) -> list[str]:
         return self.file_repository.get_all_files_paths(upload_dir_path)
 
-    def get_file_stats_by_path(self, real_file_path) -> StoredFileStatsDto:
+    def get_file_stats_by_path(self, real_file_path: str) -> \
+            StoredFileStatsDto:
         return self.file_repository.get_file_stats(real_file_path)

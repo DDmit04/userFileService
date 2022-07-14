@@ -21,7 +21,7 @@ class FileServiceFacade(TransactionRequiredService):
 
     @transactional
     def add_file(self, file: FileStorage, additional_path_str: str, comment: str):
-        additional_path_str = self._file_record_service.secure_additional_path(
+        additional_path_str = self._file_record_service.__secure_additional_path(
             additional_path_str
         )
         fileStats = get_file_stats(file)
@@ -59,7 +59,7 @@ class FileServiceFacade(TransactionRequiredService):
 
     @transactional
     def update_file_path(self, file_id: int, new_path: str) -> FileRecord:
-        new_path = self._file_record_service.secure_additional_path(new_path)
+        new_path = self._file_record_service.__secure_additional_path(new_path)
         file_record_to_update: FileRecord = self._file_record_service\
             .get_record_by_id(file_id)
         self._file_service.update_file_path(file_record_to_update, new_path)
