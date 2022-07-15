@@ -89,22 +89,28 @@ class FileRecordServiceTest(unittest.TestCase):
             self.__record_repo.save_file_record.assert_not_called()
             self.__session_test_helper.assert_session_rollback()
 
-    @unittest.skip
     def test_add_new_file_record_by_request(self):
         # given
         self.__record_repo.find_record_by_full_path.return_value = None
-        add_file_record_request = self.__create_add_file_record_request()
+        add_file_record_request = self.__file_record_helper\
+            .create_add_file_record_request()
         new_file_record = create_new_file_record(add_file_record_request)
         # when
-        self.__record_service.add_new_file_record_by_request(
-            add_file_record_request
-        )
+        actual_file_record = self.__record_service\
+            .add_new_file_record_by_request(add_file_record_request)
         # then
         self.__record_repo.find_record_by_full_path.assert_called_once_with(
             new_file_record.path,
             new_file_record.name,
             new_file_record.extension
         )
+        self.assertEqual(new_file_record.name, actual_file_record.name)
+        self.assertEqual(new_file_record.extension, actual_file_record.extension)
+        self.assertEqual(new_file_record.path, actual_file_record.path)
+        self.assertEqual(new_file_record.size, actual_file_record.size)
+        self.assertEqual(new_file_record.comment, actual_file_record.comment)
+        self.assertIsNone(actual_file_record.updated_at)
+
         self.__record_repo.save_file_record.assert_called_once_with(
             new_file_record
         )
@@ -158,48 +164,69 @@ class FileRecordServiceTest(unittest.TestCase):
         )
         self.__session_test_helper.assert_session_commit()
 
-    @unittest.skip
     def test_update_record_comment(self):
         # given
         record_id = self.__common_record_id
         new_comment = self.__common_new_comment
-        update_dict = {FileRecord.comment: new_comment}
         # when
         self.__record_service.update_record_comment(record_id, new_comment)
         # then
-        self.__record_repo.update_file_record.assert_called_once_with(
+        self.__record_repo.update_file_record.assert_called_once()
+        update_record_args = self.__record_repo.update_file_record \
+            .call_args.args
+        self.assertEqual(
             record_id,
-            update_dict
+            update_record_args[0],
+            "Wrong record id was pass to update!"
+        )
+        self.assertEqual(
+            new_comment,
+            update_record_args[1][FileRecord.comment],
+            "Wrong record new comment was pass to update!"
         )
         self.__session_test_helper.assert_session_commit()
 
-    @unittest.skip
     def test_update_record_name(self):
         # given
         record_id = self.__common_record_id
         new_name = self.__common_new_filename
-        update_dict = {FileRecord.name: new_name}
         # when
         self.__record_service.update_record_name(record_id, new_name)
         # then
-        self.__record_repo.update_file_record.assert_called_once_with(
+        self.__record_repo.update_file_record.assert_called_once()
+        update_record_args = self.__record_repo.update_file_record \
+            .call_args.args
+        self.assertEqual(
             record_id,
-            update_dict
+            update_record_args[0],
+            "Wrong record id was pass to update!"
+        )
+        self.assertEqual(
+            new_name,
+            update_record_args[1][FileRecord.name],
+            "Wrong record new name was pass to update!"
         )
         self.__session_test_helper.assert_session_commit()
 
-    @unittest.skip
     def test_update_record_path(self):
         # given
         record_id = self.__common_record_id
         new_path = self.__common_new_path
-        update_dict = {FileRecord.path: new_path}
         # when
         self.__record_service.update_record_path(record_id, new_path)
         # then
-        self.__record_repo.update_file_record.assert_called_once_with(
+        self.__record_repo.update_file_record.assert_called_once()
+        update_record_args = self.__record_repo.update_file_record \
+            .call_args.args
+        self.assertEqual(
             record_id,
-            update_dict
+            update_record_args[0],
+            "Wrong record id was pass to update!"
+        )
+        self.assertEqual(
+            new_path,
+            update_record_args[1][FileRecord.path],
+            "Wrong record new path was pass to update!"
         )
         self.__session_test_helper.assert_session_commit()
 
