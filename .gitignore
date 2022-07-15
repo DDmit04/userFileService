@@ -7,3 +7,6 @@ __pycache__/
 /docker/cron/logs/*
 /docker/boto/data/*
 /docker/boto/credentials
+/docker/postgres/minio/*
+/docker/postgres/yandex/*
+/docker/postgres/local/*
