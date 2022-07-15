@@ -40,7 +40,7 @@ def get_random_filename() -> str:
 def get_random_filestats() -> StoredFileStatsDto:
     res = StoredFileStatsDto(
         random.randint(100, 2000),
-        datetime.datetime.now(),
-        datetime.datetime.now()
+        datetime.now(),
+        datetime.now()
     )
     return res

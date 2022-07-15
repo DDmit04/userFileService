@@ -42,7 +42,9 @@ class DefaultDependencyInjector:
             os.environ.get("REFRESH_LIFETIME_SECONDS", '7d')
         )
         jwt_Secret = os.environ.get('JWT_SECRET', '')
+        env = os.environ.get('ENV', 'PROD')
         config = {
+            'ENV': env,
             'ROOT_DIR': root_dir,
             'PATH_SEPARATOR': path_separator,
             'UPLOAD_DIR_PATH': upload_dir,
