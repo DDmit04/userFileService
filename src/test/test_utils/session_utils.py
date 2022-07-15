@@ -15,3 +15,8 @@ class SessionTestHelper:
         self.session_mock.begin_nested.assert_called_once()
         self.session_transaction_mock.commit.assert_called_once()
         self.session_transaction_mock.rollback.assert_not_called()
+
+    def assert_session_rollback(self):
+        self.session_mock.begin_nested.assert_called_once()
+        self.session_transaction_mock.rollback.assert_called_once()
+        self.session_transaction_mock.commit.assert_not_called()

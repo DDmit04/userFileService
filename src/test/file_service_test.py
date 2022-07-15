@@ -7,6 +7,7 @@ from unittest.mock import Mock
 
 from werkzeug.datastructures import FileStorage
 
+from exception.file.file_not_found_exception import FileNotFoundException
 from repository.file_repo.file_repository import FileRepository
 from service.file_service.file_service import FileService
 from test.test_utils.file_record_utils import FileRecordTestHelper
@@ -129,6 +130,7 @@ class FileServiceTest(unittest.TestCase):
         # given
         add_path = self.__common_additional_path
         filename = self.__common_filename
+        self.__file_repo.check_file_exists.return_value = True
         expected_filepath = self.__file_service.get_filepath(
             add_path,
             filename
@@ -147,6 +149,26 @@ class FileServiceTest(unittest.TestCase):
         self.__file_repo.check_file_exists.assert_called_once_with(
             expected_filepath
         )
+
+    def test_get_filepath_check_exists_failure(self):
+        # given
+        add_path = self.__common_additional_path
+        filename = self.__common_filename
+        self.__file_repo.check_file_exists.return_value = False
+        expected_filepath = self.__file_service.get_filepath(
+            add_path,
+            filename
+        )
+        with self.assertRaises(FileNotFoundException):
+            # when
+            actual_filepath = self.__file_service.get_filepath_check_exists(
+                add_path,
+                filename
+            )
+            # then
+            self.__file_repo.check_file_exists.assert_called_once_with(
+                expected_filepath
+            )
 
     def test_get_filepath(self):
         # given

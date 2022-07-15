@@ -2,6 +2,8 @@ import unittest
 from datetime import datetime
 from unittest.mock import Mock
 
+from exception.records.file_record_path_already_exists_exception import \
+    FileRecordPathAlreadyExistsException
 from model.file_record import FileRecord
 from repository.file_record_repository import FileRecordRepository
 from service.file_record_service import FileRecordService
@@ -57,6 +59,35 @@ class FileRecordServiceTest(unittest.TestCase):
             new_file_record
         )
         self.__session_test_helper.assert_session_commit()
+
+    def test_add_new_file_record_failure(self):
+        # given
+        add_file_record_request = \
+            self.__file_record_helper.create_add_file_record_request()
+        creation_time = datetime.now()
+        update_time = datetime.now()
+        new_file_record = create_new_file_record(
+            add_file_record_request,
+            creation_time,
+            update_time
+        )
+        self.__record_repo.find_record_by_full_path.return_value = \
+            self.__file_record_helper.create_test_file_record()
+        # when
+        with self.assertRaises(FileRecordPathAlreadyExistsException):
+            self.__record_service.add_new_file_record(
+                add_file_record_request,
+                creation_time,
+                update_time
+            )
+            # then
+            self.__record_repo.find_record_by_full_path.assert_called_once_with(
+                new_file_record.path,
+                new_file_record.name,
+                new_file_record.extension
+            )
+            self.__record_repo.save_file_record.assert_not_called()
+            self.__session_test_helper.assert_session_rollback()
 
     @unittest.skip
     def test_add_new_file_record_by_request(self):
