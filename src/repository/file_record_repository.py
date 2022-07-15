@@ -1,5 +1,8 @@
-from datetime import datetime
+from sqlalchemy.orm import Session
 
+from exception.records.file_recordId_not_found_exception import \
+    FileRecordIdNotFoundException
+from model.file_record import FileRecord
 from sqlalchemy.orm import Session
 
 from exception.records.file_recordId_not_found_exception import \
@@ -54,11 +57,6 @@ class FileRecordRepository:
         return file_records
 
     def update_file_record(self, file_id, update_dict):
-        current_date = datetime.now()
-        current_date_iso = current_date.isoformat()
-        update_dict.update({
-            FileRecord.updated_at: current_date_iso
-        })
         self.session \
             .query(FileRecord) \
             .filter(FileRecord.id == file_id) \

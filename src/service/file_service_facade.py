@@ -20,10 +20,12 @@ class FileServiceFacade(TransactionRequiredService):
         self._file_record_service = file_record_service
 
     @transactional
-    def add_file(self, file: FileStorage, additional_path_str: str, comment: str):
-        additional_path_str = self._file_record_service.__secure_additional_path(
-            additional_path_str
-        )
+    def add_file(self,
+                 file: FileStorage,
+                 additional_path_str: str,
+                 comment: str) -> FileRecord:
+        additional_path_str = self._file_record_service \
+            .secure_additional_path(additional_path_str)
         fileStats = get_file_stats(file)
         addFileRecordRequest: AddFileRecordRequest = AddFileRecordRequest(
             fileStats.filename,
@@ -31,7 +33,7 @@ class FileServiceFacade(TransactionRequiredService):
             fileStats.size,
             additional_path_str,
             comment)
-        created_file = self._file_record_service\
+        created_file = self._file_record_service \
             .add_new_file_record_by_request(addFileRecordRequest)
         self._file_service.save_file(
             file,
@@ -41,7 +43,7 @@ class FileServiceFacade(TransactionRequiredService):
 
     @transactional
     def delete_file(self, file_id: int):
-        file_to_delete_info: FileRecord = self._file_record_service\
+        file_to_delete_info: FileRecord = self._file_record_service \
             .get_record_by_id(file_id)
         additional_path = file_to_delete_info.path
         full_filename = file_to_delete_info.get_full_filename()
@@ -50,19 +52,19 @@ class FileServiceFacade(TransactionRequiredService):
 
     @transactional
     def update_filename(self, file_id: int, new_name: str) -> FileRecord:
-        file_record_to_update: FileRecord = self._file_record_service\
+        file_record_to_update = self._file_record_service \
             .get_record_by_id(file_id)
         self._file_service.update_filename(file_record_to_update, new_name)
-        file_record_to_update = self._file_record_service\
+        file_record_to_update = self._file_record_service \
             .update_record_name(file_id, new_name)
         return file_record_to_update
 
     @transactional
     def update_file_path(self, file_id: int, new_path: str) -> FileRecord:
-        new_path = self._file_record_service.__secure_additional_path(new_path)
-        file_record_to_update: FileRecord = self._file_record_service\
+        new_path = self._file_record_service.secure_additional_path(new_path)
+        file_record_to_update: FileRecord = self._file_record_service \
             .get_record_by_id(file_id)
         self._file_service.update_file_path(file_record_to_update, new_path)
-        file_record_to_update = self._file_record_service\
+        file_record_to_update = self._file_record_service \
             .update_record_path(file_id, new_path)
         return file_record_to_update

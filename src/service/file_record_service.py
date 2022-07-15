@@ -59,21 +59,21 @@ class FileRecordService(TransactionRequiredService):
     @transactional
     def update_record_comment(self, file_id: int, new_comment: str):
         update_dict = {FileRecord.comment: new_comment}
-        self._file_record_repo.update_file_record(file_id, update_dict)
+        self.__update_record(file_id, update_dict)
 
     @transactional
     def update_record_name(self, file_id: int, new_name: str):
         update_dict = {FileRecord.name: new_name}
-        self._file_record_repo.update_file_record(file_id, update_dict)
+        self.__update_record(file_id, update_dict)
 
     @transactional
     def update_record_path(self, file_id: int, new_path: str):
         update_dict = {FileRecord.path: new_path}
-        self._file_record_repo.update_file_record(file_id, update_dict)
+        self.__update_record(file_id, update_dict)
 
     @transactional
     def get_records_on_dir(self, dir_level: str) -> list[FileRecord]:
-        dir_level = self.__secure_additional_path(dir_level)
+        dir_level = self.secure_additional_path(dir_level)
         file_records = self._file_record_repo.get_file_records_with_path(
             dir_level
         )
@@ -84,13 +84,21 @@ class FileRecordService(TransactionRequiredService):
         file_record = self._file_record_repo.get_file_record_by_id(file_id)
         return file_record
 
-    def __secure_additional_path(self, path: str):
+    def secure_additional_path(self, path: str):
         path_separator = self._path_separator
         if not path.startswith(path_separator):
             path = f'/{path}'
         if path.endswith(path_separator):
             path = path[:-1]
         return path
+
+    def __update_record(self, file_id, update_dict):
+        current_date = datetime.now()
+        current_date_iso = current_date.isoformat()
+        update_dict.update({
+            FileRecord.updated_at: current_date_iso
+        })
+        self._file_record_repo.update_file_record(file_id, update_dict)
 
     def __add_file_record(self, new_file_record: FileRecord) -> FileRecord:
         filename = new_file_record.name

@@ -1,6 +1,9 @@
+import random
+import string
 from datetime import datetime
 
 from model.dto.add_file_record_request import AddFileRecordRequest
+from model.dto.stored_fIle_stats_dto import StoredFileStatsDto
 from model.file_record import FileRecord
 
 
@@ -12,6 +15,7 @@ def create_new_file_record(add_record_request: AddFileRecordRequest,
     if created is not None:
         current_date_iso = created.isoformat()
     new_file: FileRecord = FileRecord(
+        None,
         name=add_record_request.name,
         extension=add_record_request.extension,
         size=add_record_request.size,
@@ -23,15 +27,20 @@ def create_new_file_record(add_record_request: AddFileRecordRequest,
     return new_file
 
 
-# TODO make random
-def create_test_file_record(rec_id: int = 1) -> FileRecord:
-    updated_record = FileRecord()
-    updated_record.id = rec_id
-    updated_record.name = 'name'
-    updated_record.extension = '.ext'
-    updated_record.size = 100
-    updated_record.path = '/path'
-    updated_record.created_at = datetime.now()
-    updated_record.updated_at = datetime.now()
-    updated_record.comment = 'comment'
-    return updated_record
+def get_random_string(length: int) -> str:
+    return ''.join(
+        random.choice(string.ascii_uppercase + string.digits) for _
+        in range(length))
+
+
+def get_random_filename() -> str:
+    return f'{get_random_string(5)}.{get_random_string(3)}'
+
+
+def get_random_filestats() -> StoredFileStatsDto:
+    res = StoredFileStatsDto(
+        random.randint(100, 2000),
+        datetime.datetime.now(),
+        datetime.datetime.now()
+    )
+    return res
