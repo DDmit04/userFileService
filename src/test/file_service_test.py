@@ -199,12 +199,12 @@ class FileServiceTest(unittest.TestCase):
         # given
         path = self.__common_new_additional_path
         full_name = self.__get_full_common_filename()
-        file_data = 'data'
-        file_encoding = "ascii"
         expected_filepath = self.__file_service.get_filepath(
             path,
             full_name
         )
+        file_data = 'data'
+        file_encoding = "ascii"
         mocked_open_function = mock.mock_open(
             read_data=file_data.encode(file_encoding)
         )

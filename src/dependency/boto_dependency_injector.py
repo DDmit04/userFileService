@@ -5,7 +5,7 @@ import boto3
 from boto3.resources.base import ServiceResource
 
 from dependency.default_dependency_injector import DefaultDependencyInjector
-from repository.file_repo.boto_file_repository import MinioFileRepository
+from repository.file_repo.boto_file_repository import BotoFileRepository
 from service.file_service.boto_file_service import MinioFileService
 from service.file_service.file_service import FileService
 
@@ -37,7 +37,7 @@ class MinioDependencyInjector(DefaultDependencyInjector):
     def get_file_repository(self):
         config = self.get_config()
         default_bucket = config['DEFAULT_BUCKET_NAME']
-        return MinioFileRepository(self.get_boto_client(), default_bucket)
+        return BotoFileRepository(self.get_boto_client(), default_bucket)
 
     def get_boto_client(self) -> ServiceResource:
         config = self.get_config()

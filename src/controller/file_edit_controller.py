@@ -44,5 +44,5 @@ def update_filename(session_id: str, file_id: int):
 def update_file_path(session_id: str, file_id: int):
     new_path = request.json['path']
     file_service_facade = di_container.get_file_service_facade(session_id)
-    file_service_facade.update_file_path(file_id, new_path)
+    file_service_facade.update_file_path_or_name(file_id, new_path)
     return Response(status=204)

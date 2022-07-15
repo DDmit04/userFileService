@@ -9,7 +9,7 @@ from model.dto.stored_fIle_stats_dto import StoredFileStatsDto
 from repository.file_repo.file_repository import FileRepository
 
 
-class MinioFileRepository(FileRepository):
+class BotoFileRepository(FileRepository):
 
     def __init__(self, boto_client: ServiceResource, default_bucket_name: str):
         super().__init__()
@@ -45,7 +45,8 @@ class MinioFileRepository(FileRepository):
     def check_file_exists(self, filepath: str):
         try:
             self._boto_client.head_object(
-                Bucket=self._default_bucket_name, Key=filepath
+                Bucket=self._default_bucket_name,
+                Key=filepath
             )
         except ClientError as e:
             if e.response['ResponseMetadata']['HTTPStatusCode'] == 404:
@@ -57,9 +58,23 @@ class MinioFileRepository(FileRepository):
     def load_file(self, filepath) -> io.BytesIO:
         file = io.BytesIO()
         self._boto_client.download_fileobj(
-            self._default_bucket_name, filepath, file
+            self._default_bucket_name,
+            filepath,
+            file
         )
         return file
+
+    def get_file_stats(self, real_file_path) -> StoredFileStatsDto:
+        response = self._boto_client.list_objects_v2(
+            Bucket=self._default_bucket_name,
+            Prefix=real_file_path
+        )
+        file_data = response['Contents'][0]
+        size = file_data['Size']
+        last_updated = file_data['LastModified']
+        created = datetime.now()
+        res = StoredFileStatsDto(size, created, last_updated)
+        return res
 
     def __move_file(self, old_file_path: str, new_file_path: str):
         copy_source = {
@@ -75,16 +90,3 @@ class MinioFileRepository(FileRepository):
             Bucket=self._default_bucket_name,
             Key=old_file_path
         )
-
-    def get_file_stats(self, real_file_path) -> StoredFileStatsDto:
-        response = self._boto_client.list_objects_v2(
-            Bucket=self._default_bucket_name,
-            Prefix=real_file_path
-        )
-        print(response['Contents'][0])
-        file_data = response['Contents'][0]
-        size = file_data['Size']
-        last_updated = file_data['LastModified']
-        created = datetime.now()
-        res = StoredFileStatsDto(size, created, last_updated)
-        return res

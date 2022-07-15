@@ -2,6 +2,7 @@ import random
 from datetime import datetime
 
 from model.dto.add_file_record_request import AddFileRecordRequest
+from model.dto.stored_fIle_stats_dto import StoredFileStatsDto
 from model.file_record import FileRecord
 from utils.data_utils import get_random_string, get_random_filename
 
@@ -61,3 +62,11 @@ class FileRecordTestHelper:
                 )
             )
         return paths
+
+    def get_test_stored_file_stats(self):
+        expected_file_stats = StoredFileStatsDto(
+            random.randint(100, 2000),
+            datetime.now(),
+            datetime.now()
+        )
+        return expected_file_stats
